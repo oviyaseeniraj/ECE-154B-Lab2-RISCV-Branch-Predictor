@@ -212,7 +212,9 @@ module ucsbece154b_controller (
  assign FlushD_o = PCSrcE_o;
  assign FlushE_o = lwStall | PCSrcE_o; 
   
-
+// SIgnals to identify branch/jump instructions
+wire is_branchE = (op_i == instr_branch_op);
+wire is_jumpE = (op_i == instr_jal_op) || (op_i == instr_jalr_op);
 
 endmodule
 

@@ -51,7 +51,8 @@ reg [31:0] ResultW;
 
 // Mux feeding to PC
 wire [31:0] PCPlus4F = PCF_o + 32'd4;
-wire [31:0] PCnewF =  PCSrcE_i ? PCTargetE : PCPlus4F;
+wire [31:0] PCnewF = PCSrcE_i ? PCTargetE : 
+                    (BranchTakenF ? BTBtargetF : PCPlus4F);
 
 // Update registers
 always @ (posedge clk) begin
@@ -78,6 +79,31 @@ ucsbece154b_rf rf (
     .a1_i(Rs1D_o), .a2_i(Rs2D_o), .a3_i(RdW_o),
     .rd1_o(RD1D), .rd2_o(RD2D),
     .we3_i(RegWriteW_i), .wd3_i(ResultW)
+);
+
+// Branch prediction signals
+wire [31:0] BTBtargetF;
+wire BranchTakenF;
+wire [NUM_GHR_BITS-1:0] PHTreadaddressF;
+// Branch predictor instance
+ucsbece154b_branch #(
+    .NUM_BTB_ENTRIES(32),
+    .NUM_GHR_BITS(5)
+) branch_predictor (
+    .clk(clk),
+    .reset_i(reset),
+    .pc_i(PCF_o),
+    .BTBwriteaddress_i(BTBwriteaddressE),
+    .BTBwritedata_i(BTBwritedataE),
+    .BTBtarget_o(BTBtargetF),
+    .BTB_we(BTBweE),
+    .BranchTaken_o(BranchTakenF),
+    .op_o(op_i),
+    .PHTincrement_i(PHTincrementE),
+    .GHRreset_i(GHRresetE),
+    .PHTwe_i(PHTweE),
+    .PHTwriteaddress_i(PHTwriteaddressE),
+    .PHTreadaddress_o(PHTreadaddressF)
 );
 
 // Sign extension
@@ -116,6 +142,21 @@ end
 // ***** EXECUTE STAGE ******************************
 reg [31:0] RD1E, RD2E, PCPlus4E, ExtImmE, PCE; 
 reg [31:0] ForwardDataM;
+
+// Signals for branch predictor update
+wire [31:0] BTBwritedataE = {PCE[31:$clog2(32)+2], ALUResultE, is_jumpE, is_branchE};
+wire [$clog2(32)-1:0] BTBwriteaddressE = PCE[$clog2(32)+1:2];
+wire BTBweE = (is_jumpE || (is_branchE && BranchTakenE));
+wire PHTweE = is_branchE;
+wire PHTincrementE = BranchTakenE;
+wire [NUM_GHR_BITS-1:0] PHTwriteaddressE = PHTreadaddressD;
+wire GHRresetE = PCSrcE_i;  // Flush on misprediction
+
+// Pipeline PHT index from fetch to execute
+reg [NUM_GHR_BITS-1:0] PHTreadaddressD;
+always @(posedge clk) begin
+    if (!StallD_i) PHTreadaddressD <= PHTreadaddressF;
+end
 
 // Forwarding muxes 
 reg  [31:0] SrcAE;
