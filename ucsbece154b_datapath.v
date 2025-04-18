@@ -183,7 +183,7 @@ ucsbece154b_alu alu (
 
 // Branch Predictor Update Logic
 assign is_branchE = (op_o == instr_branch_op);
-assign is_jumpE = (op_o == instr_jal_op) || (op_o == instr_jalr_op);
+assign is_jumpE = (op_o == instr_jal_op) || (op_o == instr_jalr_op); // not sure if this will work the "instr" pieces are from controller, also defined branch and jump there
 assign BTBwritedataE = {PCE[31:$clog2(NUM_BTB_ENTRIES)+2], ALUResultE, is_jumpE, is_branchE};
 assign BTBwriteaddressE = PCE[$clog2(NUM_BTB_ENTRIES)+1:2];
 assign BTBweE = (is_jumpE || (is_branchE && PCSrcE_i));
