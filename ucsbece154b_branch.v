@@ -54,8 +54,6 @@ end
 
 // Execute stage: update BTB
 always @(posedge clk) begin
-    is_branch = (op_i == instr_branch_op);
-    is_jump   = (op_i == instr_jal_op) || (op_i == instr_jalr_op);
     if (reset_i) begin
         integer i;
         for (i = 0; i < NUM_BTB_ENTRIES; i = i + 1) begin
@@ -69,8 +67,8 @@ always @(posedge clk) begin
         BTB_tag[BTBwriteaddress_i]    <= pc_i[31:$clog2(NUM_BTB_ENTRIES)+2];
 
         // Set J/B flags based on op_i
-        BTB_J[BTBwriteaddress_i] <= is_jump;
-        BTB_B[BTBwriteaddress_i] <= is_branch;
+        BTB_J[BTBwriteaddress_i] <= (op_i == instr_jal_op) || (op_i == instr_jalr_op);
+        BTB_B[BTBwriteaddress_i] <= (op_i == instr_branch_op);
     end
 end
 
@@ -86,9 +84,38 @@ end
 // PHT update
 always @(posedge clk) begin
     if (reset_i) begin
-        integer i;
-        for (i = 0; i < (1 << NUM_GHR_BITS); i = i + 1)
-            PHT[i] <= 2'b01; // weakly not taken
+        PHT[0] <= 2'b01;
+         PHT[1] <= 2'b01;
+         PHT[2] <= 2'b01;
+         PHT[3] <= 2'b01;
+         PHT[4] <= 2'b01;
+         PHT[5] <= 2'b01;
+         PHT[6] <= 2'b01;
+         PHT[7] <= 2'b01;
+         PHT[8] <= 2'b01;
+         PHT[9] <= 2'b01;
+         PHT[10] <= 2'b01;
+         PHT[11] <= 2'b01;
+         PHT[12] <= 2'b01;
+         PHT[13] <= 2'b01;
+         PHT[14] <= 2'b01;
+         PHT[15] <= 2'b01;
+         PHT[16] <= 2'b01;
+         PHT[17] <= 2'b01;
+         PHT[18] <= 2'b01;
+         PHT[19] <= 2'b01;
+         PHT[20] <= 2'b01;
+         PHT[21] <= 2'b01;
+         PHT[22] <= 2'b01;
+         PHT[23] <= 2'b01;
+         PHT[24] <= 2'b01;
+         PHT[25] <= 2'b01;
+         PHT[26] <= 2'b01;
+         PHT[27] <= 2'b01;
+         PHT[28] <= 2'b01;
+         PHT[29] <= 2'b01;
+         PHT[30] <= 2'b01;
+         PHT[31] <= 2'b01;
     end else if (PHTwe_i) begin
         if (PHTincrement_i) begin
             if (PHT[PHTwriteaddress_i] != 2'b11)
