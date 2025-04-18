@@ -52,14 +52,23 @@ module ucsbece154b_controller (
  reg [11:0] maindecoderD; // Note that maindecoder is just clubbing of signals for a convinient (compact, human readable) implementaiton of main decoder table. "reg" is required because is maindecoder is used in always block, which is used because of case statements. Also note that default in always blocks is a must in such case, otherwise maindecoder will be treated as register.
 
 
- assign {RegWriteD,	
-	ImmSrcD_o,
-        ALUSrcD,
-        MemWriteD,
-        ResultSrcD,
-	BranchD, 
-	ALUOpD,
-	JumpD} = maindecoderD;
+//  assign {RegWriteD,	
+// 	ImmSrcD_o,
+//         ALUSrcD,
+//         MemWriteD,
+//         ResultSrcD,
+// 	BranchD, 
+// 	ALUOpD,
+// 	JumpD} = maindecoderD;
+
+assign {RegWriteD, 
+    ImmSrcD_o,
+    ALUSrcD,
+    MemWriteD,
+    ResultSrcD,
+    BranchD, 
+    ALUOpD,
+    JumpD} = (RdD_i == 5'b0) ? 12'b0_xxx_x_0_xx_0_xx_0 : maindecoderD;
 
  always @ * begin
    case (op_i)
