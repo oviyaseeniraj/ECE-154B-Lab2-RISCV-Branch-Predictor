@@ -53,14 +53,14 @@ parameter NUM_GHR_BITS = 5;
 wire [31:0] BTBtargetF;
 wire BranchTakenF;
 wire [NUM_GHR_BITS-1:0] PHTreadaddressF;
-reg [NUM_GHR_BITS-1:0] PHTreadaddressD;  // Pipeline register for PHT index
-reg [NUM_GHR_BITS-1:0] PHTwriteaddressE; // Pipeline register for PHT index
-reg [31:0] BTBwritedataE; // Pipeline register for BTB data
-reg [31:0] BTBwriteaddressE; // Pipeline register for BTB address
-reg BTBweE; // Pipeline register for BTB write enable
-reg PHTweE; // Pipeline register for PHT write enable
-reg PHTincrementE; // Pipeline register for PHT increment
-reg GHRresetE; // Pipeline register for GHR reset
+wire [NUM_GHR_BITS-1:0] PHTreadaddressD;  // Pipeline register for PHT index
+wire [NUM_GHR_BITS-1:0] PHTwriteaddressE; // Pipeline register for PHT index
+wire [31:0] BTBwritedataE; // Pipeline register for BTB data
+wire [31:0] BTBwriteaddressE; // Pipeline register for BTB address
+wire BTBweE; // Pipeline register for BTB write enable
+wire PHTweE; // Pipeline register for PHT write enable
+wire PHTincrementE; // Pipeline register for PHT increment
+wire GHRresetE; // Pipeline register for GHR reset
 
 
 // ***** FETCH STAGE *********************************
