@@ -68,7 +68,7 @@ assign {RegWriteD,
     ResultSrcD,
     BranchD, 
     ALUOpD,
-    JumpD} = (RdD_i == 5'b0) ? 12'b0_xxx_x_0_xx_0_xx_0 : maindecoderD;
+    JumpD} = (RdE_i == 5'b0) ? 12'b0_xxx_x_0_xx_0_xx_0 : maindecoderD;
 
  always @ * begin
    case (op_i)
