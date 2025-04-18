@@ -211,6 +211,25 @@ always @ (posedge clk) begin
     end 
 end
 
+ucsbece154b_branch #(
+    .NUM_BTB_ENTRIES(NUM_BTB_ENTRIES),
+    .NUM_GHR_BITS(NUM_GHR_BITS)
+) branch_predictor (
+    .clk(clk),
+    .reset_i(reset),
+    .pc_i(PCF_o),
+    .BTBwriteaddress_i(BTBwriteaddressE),
+    .BTBwritedata_i(BTBwritedataE),
+    .BTBtarget_o(BTBtargetF),
+    .BTB_we(BTBweE),
+    .BranchTaken_o(BranchTakenF),
+    .op_i(op_o),
+    .PHTincrement_i(PHTincrementE),
+    .GHRreset_i(GHRresetE),
+    .PHTwe_i(PHTweE),
+    .PHTwriteaddress_i(PHTwriteaddressE),
+    .PHTreadaddress_o(PHTreadaddressF)
+);
 
 // ***** MEMORY STAGE ***************************
 reg [31:0] ExtImmM, PCPlus4M;
