@@ -47,6 +47,14 @@ module ucsbece154b_datapath (
 wire [31:0] PCTargetE;
 reg [31:0] ResultW;
 
+parameter NUM_BTB_ENTRIES = 32;
+parameter NUM_GHR_BITS = 5;
+
+wire [31:0] BTBtargetF;
+wire BranchTakenF;
+wire [NUM_GHR_BITS-1:0] PHTreadaddressF;
+reg [NUM_GHR_BITS-1:0] PHTreadaddressD;  // Pipeline register for PHT index
+
 // ***** FETCH STAGE *********************************
 
 // Mux feeding to PC
