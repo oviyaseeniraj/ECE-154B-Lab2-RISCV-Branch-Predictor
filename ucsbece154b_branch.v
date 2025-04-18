@@ -94,8 +94,8 @@ end
 
 // PHT update logic - execute stage
 always @(posedge clk) begin
-    integer i;
     if (reset_i) begin
+        integer i;
         // Initialize all PHT counters to weakly not-taken (01)
         for (i = 0; i < (1<<NUM_GHR_BITS); i = i + 1)
             PHT[i] <= 2'b00;
