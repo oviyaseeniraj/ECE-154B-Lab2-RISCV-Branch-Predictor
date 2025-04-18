@@ -95,10 +95,39 @@ end
 // PHT update logic - execute stage
 always @(posedge clk) begin
     if (reset_i) begin
-        integer i;
         // Initialize all PHT counters to weakly not-taken (01)
-        for (i = 0; i < (1<<NUM_GHR_BITS); i = i + 1)
-            PHT[i] <= 2'b00;
+        PHT[0] <= 2'b01;
+        PHT[1] <= 2'b01;
+        PHT[2] <= 2'b01;
+        PHT[3] <= 2'b01;
+        PHT[4] <= 2'b01;
+        PHT[5] <= 2'b01;
+        PHT[6] <= 2'b01;
+        PHT[7] <= 2'b01;
+        PHT[8] <= 2'b01;
+        PHT[9] <= 2'b01;
+        PHT[10] <= 2'b01;
+        PHT[11] <= 2'b01;
+        PHT[12] <= 2'b01;
+        PHT[13] <= 2'b01;
+        PHT[14] <= 2'b01;
+        PHT[15] <= 2'b01;
+        PHT[16] <= 2'b01;
+        PHT[17] <= 2'b01;
+        PHT[18] <= 2'b01;
+        PHT[19] <= 2'b01;
+        PHT[20] <= 2'b01;
+        PHT[21] <= 2'b01;
+        PHT[22] <= 2'b01;
+        PHT[23] <= 2'b01;
+        PHT[24] <= 2'b01;
+        PHT[25] <= 2'b01;
+        PHT[26] <= 2'b01;
+        PHT[27] <= 2'b01;
+        PHT[28] <= 2'b01;
+        PHT[29] <= 2'b01;
+        PHT[30] <= 2'b01;
+        PHT[31] <= 2'b01;
     end else if (PHTwe_i) begin
         // Update PHT counter based on actual branch outcome
         if (PHTincrement_i) begin
