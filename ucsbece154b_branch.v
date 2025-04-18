@@ -6,7 +6,7 @@ module ucsbece154b_branch #(
     input               reset_i,
     input        [31:0] pc_i,
     input  [$clog2(NUM_BTB_ENTRIES)-1:0] BTBwriteaddress_i,
-    input        [65:0] BTBwritedata_i,   
+    input        [31:0] BTBwritedata_i,   
     output reg   [31:0] BTBtarget_o,           
     input               BTB_we, 
     output reg          BranchTaken_o,
