@@ -56,7 +56,7 @@ wire [NUM_GHR_BITS-1:0] PHTreadaddressF;
 wire [NUM_GHR_BITS-1:0] PHTreadaddressD;  // Pipeline register for PHT index
 wire [NUM_GHR_BITS-1:0] PHTwriteaddressE; // Pipeline register for PHT index
 wire [31:0] BTBwritedataE; // Pipeline register for BTB data
-wire [31:0] BTBwriteaddressE; // Pipeline register for BTB address
+wire [4:0] BTBwriteaddressE; // Pipeline register for BTB address
 wire BTBweE; // Pipeline register for BTB write enable
 wire PHTweE; // Pipeline register for PHT write enable
 wire PHTincrementE; // Pipeline register for PHT increment
