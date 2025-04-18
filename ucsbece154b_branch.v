@@ -55,16 +55,200 @@ end
 // Execute stage: update BTB
 always @(posedge clk) begin
     if (reset_i) begin
-        integer i;
-        for (i = 0; i < NUM_BTB_ENTRIES; i = i + 1) begin
-            BTB_target[i] <= 32'b0;
-            BTB_tag[i]    <= 32'b0;
-            BTB_J[i]      <= 1'b0;
-            BTB_B[i]      <= 1'b0;
-        end
+        // Entry 0
+        BTB_target[0] <= 32'b0;
+        BTB_tag[0]    <= 32'b0;
+        BTB_J[0]      <= 1'b0;
+        BTB_B[0]      <= 1'b0;
+        
+        // Entry 1
+        BTB_target[1] <= 32'b0;
+        BTB_tag[1]    <= 32'b0;
+        BTB_J[1]      <= 1'b0;
+        BTB_B[1]      <= 1'b0;
+        
+        // Entry 2
+        BTB_target[2] <= 32'b0;
+        BTB_tag[2]    <= 32'b0;
+        BTB_J[2]      <= 1'b0;
+        BTB_B[2]      <= 1'b0;
+        
+        // Entry 3
+        BTB_target[3] <= 32'b0;
+        BTB_tag[3]    <= 32'b0;
+        BTB_J[3]      <= 1'b0;
+        BTB_B[3]      <= 1'b0;
+        
+        // Entry 4
+        BTB_target[4] <= 32'b0;
+        BTB_tag[4]    <= 32'b0;
+        BTB_J[4]      <= 1'b0;
+        BTB_B[4]      <= 1'b0;
+        
+        // Entry 5
+        BTB_target[5] <= 32'b0;
+        BTB_tag[5]    <= 32'b0;
+        BTB_J[5]      <= 1'b0;
+        BTB_B[5]      <= 1'b0;
+        
+        // Entry 6
+        BTB_target[6] <= 32'b0;
+        BTB_tag[6]    <= 32'b0;
+        BTB_J[6]      <= 1'b0;
+        BTB_B[6]      <= 1'b0;
+        
+        // Entry 7
+        BTB_target[7] <= 32'b0;
+        BTB_tag[7]    <= 32'b0;
+        BTB_J[7]      <= 1'b0;
+        BTB_B[7]      <= 1'b0;
+        
+        // Entry 8
+        BTB_target[8] <= 32'b0;
+        BTB_tag[8]    <= 32'b0;
+        BTB_J[8]      <= 1'b0;
+        BTB_B[8]      <= 1'b0;
+        
+        // Entry 9
+        BTB_target[9] <= 32'b0;
+        BTB_tag[9]    <= 32'b0;
+        BTB_J[9]      <= 1'b0;
+        BTB_B[9]      <= 1'b0;
+        
+        // Entry 10
+        BTB_target[10] <= 32'b0;
+        BTB_tag[10]    <= 32'b0;
+        BTB_J[10]      <= 1'b0;
+        BTB_B[10]      <= 1'b0;
+        
+        // Entry 11
+        BTB_target[11] <= 32'b0;
+        BTB_tag[11]    <= 32'b0;
+        BTB_J[11]      <= 1'b0;
+        BTB_B[11]      <= 1'b0;
+        
+        // Entry 12
+        BTB_target[12] <= 32'b0;
+        BTB_tag[12]    <= 32'b0;
+        BTB_J[12]      <= 1'b0;
+        BTB_B[12]      <= 1'b0;
+        
+        // Entry 13
+        BTB_target[13] <= 32'b0;
+        BTB_tag[13]    <= 32'b0;
+        BTB_J[13]      <= 1'b0;
+        BTB_B[13]      <= 1'b0;
+        
+        // Entry 14
+        BTB_target[14] <= 32'b0;
+        BTB_tag[14]    <= 32'b0;
+        BTB_J[14]      <= 1'b0;
+        BTB_B[14]      <= 1'b0;
+        
+        // Entry 15
+        BTB_target[15] <= 32'b0;
+        BTB_tag[15]    <= 32'b0;
+        BTB_J[15]      <= 1'b0;
+        BTB_B[15]      <= 1'b0;
+        
+        // Entry 16
+        BTB_target[16] <= 32'b0;
+        BTB_tag[16]    <= 32'b0;
+        BTB_J[16]      <= 1'b0;
+        BTB_B[16]      <= 1'b0;
+        
+        // Entry 17
+        BTB_target[17] <= 32'b0;
+        BTB_tag[17]    <= 32'b0;
+        BTB_J[17]      <= 1'b0;
+        BTB_B[17]      <= 1'b0;
+        
+        // Entry 18
+        BTB_target[18] <= 32'b0;
+        BTB_tag[18]    <= 32'b0;
+        BTB_J[18]      <= 1'b0;
+        BTB_B[18]      <= 1'b0;
+        
+        // Entry 19
+        BTB_target[19] <= 32'b0;
+        BTB_tag[19]    <= 32'b0;
+        BTB_J[19]      <= 1'b0;
+        BTB_B[19]      <= 1'b0;
+        
+        // Entry 20
+        BTB_target[20] <= 32'b0;
+        BTB_tag[20]    <= 32'b0;
+        BTB_J[20]      <= 1'b0;
+        BTB_B[20]      <= 1'b0;
+        
+        // Entry 21
+        BTB_target[21] <= 32'b0;
+        BTB_tag[21]    <= 32'b0;
+        BTB_J[21]      <= 1'b0;
+        BTB_B[21]      <= 1'b0;
+        
+        // Entry 22
+        BTB_target[22] <= 32'b0;
+        BTB_tag[22]    <= 32'b0;
+        BTB_J[22]      <= 1'b0;
+        BTB_B[22]      <= 1'b0;
+        
+        // Entry 23
+        BTB_target[23] <= 32'b0;
+        BTB_tag[23]    <= 32'b0;
+        BTB_J[23]      <= 1'b0;
+        BTB_B[23]      <= 1'b0;
+        
+        // Entry 24
+        BTB_target[24] <= 32'b0;
+        BTB_tag[24]    <= 32'b0;
+        BTB_J[24]      <= 1'b0;
+        BTB_B[24]      <= 1'b0;
+        
+        // Entry 25
+        BTB_target[25] <= 32'b0;
+        BTB_tag[25]    <= 32'b0;
+        BTB_J[25]      <= 1'b0;
+        BTB_B[25]      <= 1'b0;
+        
+        // Entry 26
+        BTB_target[26] <= 32'b0;
+        BTB_tag[26]    <= 32'b0;
+        BTB_J[26]      <= 1'b0;
+        BTB_B[26]      <= 1'b0;
+        
+        // Entry 27
+        BTB_target[27] <= 32'b0;
+        BTB_tag[27]    <= 32'b0;
+        BTB_J[27]      <= 1'b0;
+        BTB_B[27]      <= 1'b0;
+        
+        // Entry 28
+        BTB_target[28] <= 32'b0;
+        BTB_tag[28]    <= 32'b0;
+        BTB_J[28]      <= 1'b0;
+        BTB_B[28]      <= 1'b0;
+        
+        // Entry 29
+        BTB_target[29] <= 32'b0;
+        BTB_tag[29]    <= 32'b0;
+        BTB_J[29]      <= 1'b0;
+        BTB_B[29]      <= 1'b0;
+        
+        // Entry 30
+        BTB_target[30] <= 32'b0;
+        BTB_tag[30]    <= 32'b0;
+        BTB_J[30]      <= 1'b0;
+        BTB_B[30]      <= 1'b0;
+        
+        // Entry 31
+        BTB_target[31] <= 32'b0;
+        BTB_tag[31]    <= 32'b0;
+        BTB_J[31]      <= 1'b0;
+        BTB_B[31]      <= 1'b0;
     end else if (BTB_we) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
-        BTB_tag[BTBwriteaddress_i]    <= pc_i[31:$clog2(NUM_BTB_ENTRIES)+2];
+        BTB_tag[BTBwriteaddress_i]    <= pc_i[31:$clog2(32)+2];  // 32 entries -> 5 address bits
 
         // Set J/B flags based on op_i
         BTB_J[BTBwriteaddress_i] <= (op_i == instr_jal_op) || (op_i == instr_jalr_op);
