@@ -128,7 +128,7 @@ module ucsbece154b_controller (
  reg BranchTypeE;
  reg [1:0] ResultSrcE;
 
- assign PCSrcE_o = BranchE & (ZeroE_i ^ BranchTypeE) | JumpE; 
+ assign PCSrcE_o = BranchE & (ZeroE_i ^ BranchTypeE) | JumpE;
 
 // Update registers (move control signals via pipeline)
  always @(posedge clk) begin
@@ -212,9 +212,9 @@ module ucsbece154b_controller (
  assign FlushD_o = PCSrcE_o;
  assign FlushE_o = lwStall | PCSrcE_o; 
   
-// SIgnals to identify branch/jump instructions
+// ====================== Branch Predictor Support ======================
+// Instruction type detection for predictor updates
 wire is_branchE = (op_i == instr_branch_op);
 wire is_jumpE = (op_i == instr_jal_op) || (op_i == instr_jalr_op);
 
 endmodule
-
