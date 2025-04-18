@@ -104,6 +104,7 @@ module ucsbece154b_controller (
         //     `endif  
        endcase
     default: 
+      ALUControlD = ALUcontrol_add;
       `ifdef SIM
           $warning("Unsupported ALUop given: %h", ALUOpD);
       `else
