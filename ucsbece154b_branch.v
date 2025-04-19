@@ -57,10 +57,15 @@ assign PHTreadaddress_o = GHR ^ pc_i[NUM_GHR_BITS+1:2];
 wire is_branch = (op_i == instr_branch_op);
 wire is_jump   = (op_i == instr_jal_op) || (op_i == instr_jalr_op);
 
+// Modified branch prediction logic
 always @(*) begin
-    if (BTB_hit) begin
+    if (BTB_hit && BTB_valid[BTB_index]) begin
         BTBtarget_o = BTB_target[BTB_index];
-        BranchTaken_o = is_jump ? 1'b1 : PHT[PHTreadaddress_o][1];
+        // Always predict taken for backward branches
+        if ($signed(pc_i - BTB_target[BTB_index]) > 0) // Backward branch
+            BranchTaken_o = 1'b1;
+        else
+            BranchTaken_o = PHT[PHTreadaddress_o][1];
     end else begin
         BTBtarget_o = pc_i + 4;
         BranchTaken_o = 1'b0;
