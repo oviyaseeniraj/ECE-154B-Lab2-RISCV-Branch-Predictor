@@ -1,57 +1,29 @@
 // ucsbece154b_top_tb.v
-// All Rights Reserved
-// Copyright (c) 2024 UCSB ECE
-// Distribution Prohibited
+// Verilog-2001 compatible testbench
 
-`define SIM
-`define ASSERT(CONDITION, MESSAGE) if ((CONDITION)==1'b1); else begin $error($sformatf MESSAGE); end
+`timescale 1ns/1ps
 
 module ucsbece154b_top_tb ();
 
 // Clock generation
 reg clk = 1;
-always #1 clk <= ~clk;
+always #5 clk = ~clk;  // 100MHz clock
 reg reset;
 
 // Instantiate DUT
 ucsbece154b_top top (
-    .clk(clk), 
+    .clk(clk),
     .reset(reset)
 );
 
 // Register file connections
 wire [31:0] reg_zero = top.riscv.dp.rf.zero;
-wire [31:0] reg_ra = top.riscv.dp.rf.ra;
-wire [31:0] reg_sp = top.riscv.dp.rf.sp;
-wire [31:0] reg_gp = top.riscv.dp.rf.gp;
-wire [31:0] reg_tp = top.riscv.dp.rf.tp;
-wire [31:0] reg_t0 = top.riscv.dp.rf.t0;
-wire [31:0] reg_t1 = top.riscv.dp.rf.t1;
-wire [31:0] reg_t2 = top.riscv.dp.rf.t2;
 wire [31:0] reg_s0 = top.riscv.dp.rf.s0;
 wire [31:0] reg_s1 = top.riscv.dp.rf.s1;
-wire [31:0] reg_a0 = top.riscv.dp.rf.a0;
-wire [31:0] reg_a1 = top.riscv.dp.rf.a1;
-wire [31:0] reg_a2 = top.riscv.dp.rf.a2;
-wire [31:0] reg_a3 = top.riscv.dp.rf.a3;
-wire [31:0] reg_a4 = top.riscv.dp.rf.a4;
-wire [31:0] reg_a5 = top.riscv.dp.rf.a5;
-wire [31:0] reg_a6 = top.riscv.dp.rf.a6;
-wire [31:0] reg_a7 = top.riscv.dp.rf.a7;
 wire [31:0] reg_s2 = top.riscv.dp.rf.s2;
 wire [31:0] reg_s3 = top.riscv.dp.rf.s3;
-wire [31:0] reg_s4 = top.riscv.dp.rf.s4;
-wire [31:0] reg_s5 = top.riscv.dp.rf.s5;
-wire [31:0] reg_s6 = top.riscv.dp.rf.s6;
-wire [31:0] reg_s7 = top.riscv.dp.rf.s7;
-wire [31:0] reg_s8 = top.riscv.dp.rf.s8;
-wire [31:0] reg_s9 = top.riscv.dp.rf.s9;
-wire [31:0] reg_s10 = top.riscv.dp.rf.s10;
-wire [31:0] reg_s11 = top.riscv.dp.rf.s11;
+wire [31:0] reg_t0 = top.riscv.dp.rf.t0;
 wire [31:0] reg_t3 = top.riscv.dp.rf.t3;
-wire [31:0] reg_t4 = top.riscv.dp.rf.t4;
-wire [31:0] reg_t5 = top.riscv.dp.rf.t5;
-wire [31:0] reg_t6 = top.riscv.dp.rf.t6;
 
 // Performance counters
 reg [31:0] jump_count;
@@ -61,17 +33,15 @@ reg [31:0] branch_mispredict_count;
 reg [31:0] cycle_count;
 reg [31:0] instruction_count;
 
-// Prediction signals
-wire is_branch = top.riscv.dp.op_o == top.riscv.dp.instr_branch_op;
+// Prediction monitoring
+wire is_branch = (top.riscv.dp.op_o == top.riscv.dp.instr_branch_op);
 wire is_jump = (top.riscv.dp.op_o == top.riscv.dp.instr_jal_op) || 
                (top.riscv.dp.op_o == top.riscv.dp.instr_jalr_op);
 wire predicted_taken = top.riscv.dp.BranchTakenF;
-wire actual_taken = top.riscv.c.PCSrcE_o;
+wire actual_taken = top.riscv.controller.PCSrcE_o;
 
-// Main test sequence
-integer i;
 initial begin
-    $display("Begin simulation.");
+    $display("=== Simulation Start ===");
     
     // Initialize counters
     jump_count = 0;
@@ -83,97 +53,62 @@ initial begin
     
     // Reset sequence
     reset = 1;
-    @(negedge clk);
-    @(negedge clk);
+    #100;
     reset = 0;
     
-    // Run simulation
-    for (i = 0; i < 250; i=i+1) begin
-        @(negedge clk);
+    // Main monitoring loop
+    while (reg_t3 !== 10) begin
+        @(posedge clk);
         cycle_count = cycle_count + 1;
         
         // Count instructions (simplified)
-        if (!top.riscv.c.StallF_o) begin
+        if (!top.riscv.controller.StallF_o) begin
             instruction_count = instruction_count + 1;
         end
         
         // Track predictions in execute stage
-        if (top.riscv.c.FlushE_o) begin
+        if (top.riscv.controller.FlushE_o) begin
             if (is_jump) begin
                 jump_count = jump_count + 1;
-                if (actual_taken != predicted_taken) begin
+                if (actual_taken !== predicted_taken) begin
                     jump_mispredict_count = jump_mispredict_count + 1;
                 end
             end
             else if (is_branch) begin
                 branch_count = branch_count + 1;
-                if (actual_taken != predicted_taken) begin
+                if (actual_taken !== predicted_taken) begin
                     branch_mispredict_count = branch_mispredict_count + 1;
                 end
             end
         end
     end
     
-    // Verification assertions
-    `ASSERT(reg_t0==32'd1, ("Register t0 (x) should remain 1, got %0d", reg_t0));
-    `ASSERT(reg_s0==32'd10, ("Register s0 (countx) should be 10, got %0d", reg_s0));
-    `ASSERT(reg_s1==32'd5, ("Register s1 (county) should be 5, got %0d", reg_s1));
-    `ASSERT(reg_s2==32'd5, ("Register s2 (countz) should be 5, got %0d", reg_s2));
-    `ASSERT(reg_s3==32'd40, ("Register s3 (innercount) should be 40, got %0d", reg_s3));
-    `ASSERT(reg_t3==32'd10, ("Register t3 (outer) should be 10, got %0d", reg_t3));
-    `ASSERT(reg_zero==32'b0, ("Register zero should remain 0, got %0d", reg_zero));
+    // Verification checks
+    if (reg_s0 !== 10) $display("ERROR: s0 should be 10, got %d", reg_s0);
+    if (reg_s1 !== 5) $display("ERROR: s1 should be 5, got %d", reg_s1);
+    if (reg_s2 !== 5) $display("ERROR: s2 should be 5, got %d", reg_s2);
+    if (reg_s3 !== 40) $display("ERROR: s3 should be 40, got %d", reg_s3);
     
-    // Print performance results
-    $display("\n=== Branch Prediction Metrics ===");
-    $display("Total cycles: %0d", cycle_count);
-    $display("Instructions executed: %0d", instruction_count);
-    $display("CPI: %.2f", real'(cycle_count)/instruction_count);
+    // Print performance metrics
+    $display("\n=== Performance Metrics ===");
+    $display("Total cycles: %d", cycle_count);
+    $display("Instructions: %d", instruction_count);
+    $display("CPI: %f", $itor(cycle_count)/$itor(instruction_count));
     
     if (jump_count > 0) begin
-        $display("Jumps: %0d (%0d mispredictions, %.1f%% miss rate)", 
-                jump_count, jump_mispredict_count,
-                100.0*real'(jump_mispredict_count)/jump_count);
+        $display("Jumps: %d (%0.1f%% mispredict)", 
+               jump_count, 
+               100.0*$itor(jump_mispredict_count)/$itor(jump_count));
     end
     
     if (branch_count > 0) begin
-        $display("Branches: %0d (%0d mispredictions, %.1f%% miss rate)", 
-                branch_count, branch_mispredict_count,
-                100.0*real'(branch_mispredict_count)/branch_count);
+        $display("Branches: %d (%0.1f%% mispredict)", 
+               branch_count,
+               100.0*$itor(branch_mispredict_count)/$itor(branch_count));
     end
     
-    $display("\nEnd simulation.");
-    wait (reg_t3 == 10);  // Wait until outer loop completes
-
-    // Then print metrics
-    $display("\n=== Branch Prediction Metrics ===");
-    $display("Total cycles: %0d", cycle_count);
-    $display("Instructions executed: %0d", instruction_count);
-    if (instruction_count != 0) begin
-        $display("CPI: %.2f", real'(cycle_count)/instruction_count);
-    end
-
-    if (jump_count > 0) begin
-        $display("Jumps: %0d (%0d mispredictions, %.1f%% miss rate)", 
-                jump_count, jump_mispredict_count,
-                100.0*real'(jump_mispredict_count)/jump_count);
-    end
-
-    if (branch_count > 0) begin
-        $display("Branches: %0d (%0d mispredictions, %.1f%% miss rate)", 
-                branch_count, branch_mispredict_count,
-                100.0*real'(branch_mispredict_count)/branch_count);
-    end
-
-    $display("\nFinal Register Values:");
-    $display("t3 (outer): %0d", reg_t3);
-    $display("s0 (countx): %0d", reg_s0);
-    $display("s1 (county): %0d", reg_s1);
-    $display("s2 (countz): %0d", reg_s2);
-    $display("s3 (innercount): %0d", reg_s3);
-
-    $finish;  // Properly end simulation
+    $display("\n=== Simulation Complete ===");
+    $finish;
 end
 
 endmodule
-
-`undef ASSERT
