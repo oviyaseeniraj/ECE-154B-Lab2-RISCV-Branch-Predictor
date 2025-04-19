@@ -6,10 +6,8 @@ always #1 clk = ~clk;
 reg reset;
 
 // Instantiate DUT with configurable parameters
-ucsbece154b_top #(
-    .NUM_BTB_ENTRIES(32),
-    .NUM_GHR_BITS(5)
-) top (
+// Simple instantiation without parameters
+ucsbece154b_top top (
     .clk(clk),
     .reset(reset)
 );
