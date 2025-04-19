@@ -93,12 +93,12 @@ initial begin
         cycle_count = cycle_count + 1;
         
         // Count instructions (simplified)
-        if (!top.riscv.controller.StallF_o) begin
+        if (!top.riscv.c.StallF_o) begin
             instruction_count = instruction_count + 1;
         end
         
         // Track predictions in execute stage
-        if (top.riscv.controller.FlushE_o) begin
+        if (top.riscv.c.FlushE_o) begin
             if (is_jump) begin
                 jump_count = jump_count + 1;
                 if (actual_taken != predicted_taken) begin
