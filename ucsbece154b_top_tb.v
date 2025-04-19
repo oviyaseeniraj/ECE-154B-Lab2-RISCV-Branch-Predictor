@@ -88,7 +88,7 @@ initial begin
     reset = 0;
     
     // Run simulation
-    for (i = 0; i < 200; i=i+1) begin
+    for (i = 0; i < 250; i=i+1) begin
         @(negedge clk);
         cycle_count = cycle_count + 1;
         
