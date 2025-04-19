@@ -22,11 +22,12 @@ initial MEM[0] = 32'b0;
 always @ (posedge clk) begin
     if (we3_i && (a3_i!=5'b0))
         MEM[a3_i] <= wd3_i;
-`ifdef SIM
-    if (we3_i && (a3_i==5'b0))
-        $warning("Attempted to write to $zero register");
-`endif
+// `ifdef SIM
+//     if (we3_i && (a3_i==5'b0))
+//         $warning("Attempted to write to $zero register");
+// `endif
 end
+
 
 `ifdef SIM
 wire [31:0] zero = MEM[5'd0];

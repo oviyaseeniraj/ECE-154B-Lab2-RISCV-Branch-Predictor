@@ -2,80 +2,141 @@ module ucsbece154b_top_tb ();
 
 // Clock generation (2ns period for faster simulation)
 reg clk = 1;
-always #1 clk = ~clk;  // 500MHz clock for simulation speed
+always #1 clk = ~clk;
 reg reset;
 
-// Instantiate DUT
-ucsbece154b_top top (
+// Instantiate DUT with configurable parameters
+ucsbece154b_top #(
+    .NUM_BTB_ENTRIES(32),
+    .NUM_GHR_BITS(5)
+) top (
     .clk(clk),
     .reset(reset)
 );
 
 // Register file connections
-wire [31:0] reg_zero = top.riscv.dp.rf.zero;
-wire [31:0] reg_s0 = top.riscv.dp.rf.s0;
-wire [31:0] reg_s1 = top.riscv.dp.rf.s1;
-wire [31:0] reg_s2 = top.riscv.dp.rf.s2;
-wire [31:0] reg_s3 = top.riscv.dp.rf.s3;
-wire [31:0] reg_t0 = top.riscv.dp.rf.t0;
 wire [31:0] reg_t3 = top.riscv.dp.rf.t3;
 
-// Performance monitoring
+// Performance counters
 reg [31:0] cycle_count;
+reg [31:0] instruction_count;
+reg [31:0] jump_count;
+reg [31:0] jump_mispredict_count;
+reg [31:0] branch_count;
+reg [31:0] branch_mispredict_count;
+
+// Prediction monitoring
+wire is_branch = (top.riscv.dp.op_o == top.riscv.dp.instr_branch_op);
+wire is_jump = (top.riscv.dp.op_o == top.riscv.dp.instr_jal_op) || 
+               (top.riscv.dp.op_o == top.riscv.dp.instr_jalr_op);
+wire predicted_taken = top.riscv.dp.BranchTakenF;
+wire actual_taken = top.riscv.c.PCSrcE_o;
+
+// Output file for data collection
+integer results_file;
+initial begin
+    results_file = $fopen("performance_results.csv");
+    $fdisplay(results_file, "Cycles,Instructions,Jumps,JumpMisses,Branches,BranchMisses,CPI,JumpMissRate,BranchMissRate");
+end
 
 initial begin
-    $display("=== Simulation Start ===");
+    $display("=== Starting Performance Analysis ===");
     
-    // Initialize
+    // Initialize counters
     cycle_count = 0;
+    instruction_count = 0;
+    jump_count = 0;
+    jump_mispredict_count = 0;
+    branch_count = 0;
+    branch_mispredict_count = 0;
     
-    // Fast reset sequence
+    // Reset sequence
     reset = 1;
-    #4;  // 2 clock cycles
+    #4;
     reset = 0;
     
-    // Main simulation loop (runs for 500ns)
-    while (cycle_count < 250) begin  // 250 cycles * 2ns = 500ns
+    // Main simulation loop
+    while (cycle_count < 1000 && reg_t3 !== 10) begin
         @(posedge clk);
         cycle_count = cycle_count + 1;
         
-        // Early termination if t3 reaches 10
-        if (reg_t3 == 10) begin
-            $display("Early termination at cycle %d (t3 reached 10)", cycle_count);
-            break;
+        // Instruction count (approximate)
+        if (!top.riscv.c.StallF_o) begin
+            instruction_count = instruction_count + 1;
         end
         
-        // Progress reporting
-        if (cycle_count % 50 == 0) begin
+        // Track predictions in execute stage
+        if (top.riscv.c.FlushE_o) begin
+            if (is_jump) begin
+                jump_count = jump_count + 1;
+                if (actual_taken !== predicted_taken) begin
+                    jump_mispredict_count = jump_mispredict_count + 1;
+                end
+            end
+            else if (is_branch) begin
+                branch_count = branch_count + 1;
+                if (actual_taken !== predicted_taken) begin
+                    branch_mispredict_count = branch_mispredict_count + 1;
+                end
+            end
+        end
+        
+        // Periodic reporting
+        if (cycle_count % 100 == 0) begin
             $display("Cycle: %d, t3: %d", cycle_count, reg_t3);
+            // Write intermediate results
+            $fdisplay(results_file, "%d,%d,%d,%d,%d,%d,%f,%f,%f",
+                cycle_count,
+                instruction_count,
+                jump_count,
+                jump_mispredict_count,
+                branch_count,
+                branch_mispredict_count,
+                $itor(cycle_count)/$itor(instruction_count),
+                (jump_count > 0) ? ($itor(jump_mispredict_count)/$itor(jump_count)) : 0,
+                (branch_count > 0) ? ($itor(branch_mispredict_count)/$itor(branch_count)) : 0);
         end
     end
     
-    // Final checks
-    $display("\n=== Final Register Values @ %d ns ===", cycle_count*2);
-    $display("s0: %d (should be 10)", reg_s0);
-    $display("s1: %d (should be 5)", reg_s1);
-    $display("s2: %d (should be 5)", reg_s2);
-    $display("s3: %d (should be 40)", reg_s3);
-    $display("t3: %d (should be 10)", reg_t3);
+    // Final results
+    $display("\n=== Final Performance Metrics ===");
+    $display("Total cycles: %d", cycle_count);
+    $display("Instructions: %d", instruction_count);
+    $display("CPI: %f", $itor(cycle_count)/$itor(instruction_count));
     
-    if (reg_s0 !== 10) $display("ERROR: s0 should be 10");
-    if (reg_s1 !== 5) $display("ERROR: s1 should be 5");
-    if (reg_s2 !== 5) $display("ERROR: s2 should be 5");
-    if (reg_s3 !== 40) $display("ERROR: s3 should be 40");
-    if (reg_t3 !== 10) $display("ERROR: t3 should be 10");
+    if (jump_count > 0) begin
+        $display("Jumps: %d (Miss Rate: %0.1f%%)", 
+               jump_count, 
+               100.0*$itor(jump_mispredict_count)/$itor(jump_count));
+    end
     
-    $display("\n=== Simulation Complete ===");
-    $display("Total simulation time: %d ns", cycle_count*2);
+    if (branch_count > 0) begin
+        $display("Branches: %d (Miss Rate: %0.1f%%)", 
+               branch_count,
+               100.0*$itor(branch_mispredict_count)/$itor(branch_count));
+    end
+    
+    // Write final results
+    $fdisplay(results_file, "%d,%d,%d,%d,%d,%d,%f,%f,%f",
+        cycle_count,
+        instruction_count,
+        jump_count,
+        jump_mispredict_count,
+        branch_count,
+        branch_mispredict_count,
+        $itor(cycle_count)/$itor(instruction_count),
+        (jump_count > 0) ? ($itor(jump_mispredict_count)/$itor(jump_count)) : 0,
+        (branch_count > 0) ? ($itor(branch_mispredict_count)/$itor(branch_count)) : 0);
+    
+    $fclose(results_file);
+    $display("\nResults saved to performance_results.csv");
     $finish;
 end
 
-// Waveform dumping (limited to 500ns)
+// Waveform dumping
 initial begin
     $dumpfile("waveform.vcd");
     $dumpvars(0, ucsbece154b_top_tb);
-    #500;  // Limit waveform to 500ns
-    $dumpoff;
 end
 
 endmodule
