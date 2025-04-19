@@ -247,12 +247,10 @@ always @(posedge clk) begin
         BTB_J[31]      <= 1'b0;
         BTB_B[31]      <= 1'b0;
     end else if (BTB_we) begin
-        BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
-        BTB_tag[BTBwriteaddress_i]    <= pc_i[31:$clog2(32)+2];  // 32 entries -> 5 address bits
-
-        // Set J/B flags based on op_i
-        BTB_J[BTBwriteaddress_i] <= (op_i == instr_jal_op) || (op_i == instr_jalr_op);
-        BTB_B[BTBwriteaddress_i] <= (op_i == instr_branch_op);
+        BTB_target[BTB_index] <= BTBwritedata_i;  // Use same index as read path
+        BTB_tag[BTB_index] <= pc_tag;             // Use same tag calculation
+        BTB_J[BTB_index] <= (op_i == instr_jal_op) || (op_i == instr_jalr_op);
+        BTB_B[BTB_index] <= (op_i == instr_branch_op);
     end
 end
 
