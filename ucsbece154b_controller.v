@@ -114,7 +114,7 @@ assign {RegWriteD,
        endcase
     default: 
       `ifdef SIM
-          $warning("Unsupported ALUop given: %h", ALUOpD);
+          //$warning("Unsupported ALUop given: %h", ALUOpD);
       `else
           ;
       `endif   
