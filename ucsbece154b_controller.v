@@ -161,13 +161,6 @@ assign lwStall = (ResultSrcE == 1) & ( (Rs1D_i == RdE_i) | (Rs2D_i == RdE_i) ) &
 assign StallF_o = lwStall;
 assign StallD_o = lwStall;
 assign FlushD_o = PCSrcE_o;
-assign FlushE_o = lwStall | PCSrcE_o; 
-
-//branch debug
-always @(posedge clk) begin
-    if (PCSrcE_o && BranchE) 
-        $display("Branch Taken! PC=%h, Target=%h, t3=%d", 
-                PCE, PCTargetE, top.riscv.dp.rf.t3);
-end
+assign FlushE_o = lwStall | PCSrcE_o;
 
 endmodule
