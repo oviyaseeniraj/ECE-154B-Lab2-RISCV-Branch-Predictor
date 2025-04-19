@@ -44,6 +44,7 @@ wire BranchTakenF;
 wire [NUM_GHR_BITS-1:0] PHTreadaddressF;
 wire [31:0] PCPlus4F = PCF_o + 32'd4;
 
+
 wire [31:0] PCnewF = PCSrcE_i ? PCTargetE : 
                    (BranchTakenF ? BTBtargetF : PCPlus4F);
 
@@ -138,7 +139,7 @@ ucsbece154b_alu alu (
 
 wire is_branchE = (op_o == instr_branch_op);
 wire is_jumpE = (op_o == instr_jal_op) || (op_o == instr_jalr_op);
-wire [4:0] BTBwriteaddressE = PCD[$clog2(NUM_BTB_ENTRIES)+1:2];
+wire [$clog2(NUM_BTB_ENTRIES)-1:0] BTBwriteaddressE = PCD[2+:$clog2(NUM_BTB_ENTRIES)];
 wire BTBweE = (is_jumpE || (is_branchE && PCSrcE_i));
 wire PHTweE = is_branchE;
 wire PHTincrementE = PCSrcE_i;

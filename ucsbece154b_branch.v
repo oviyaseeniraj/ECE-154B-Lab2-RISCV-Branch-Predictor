@@ -48,11 +48,11 @@ reg        BTB_valid    [0:NUM_BTB_ENTRIES-1];
 reg [NUM_GHR_BITS-1:0] GHR;
 reg [1:0] PHT [0:(1<<NUM_GHR_BITS)-1];
 
-wire [$clog2(NUM_BTB_ENTRIES)-1:0] BTB_index = pc_i[$clog2(NUM_BTB_ENTRIES)+1:2];
-wire [31:0] pc_tag = pc_i[31:$clog2(NUM_BTB_ENTRIES)+2];
+wire [$clog2(NUM_BTB_ENTRIES)-1:0] BTB_index = pc_i[2+:$clog2(NUM_BTB_ENTRIES)];
+wire [31:0] pc_tag = pc_i[31:2+$clog2(NUM_BTB_ENTRIES)];
 wire BTB_hit = (BTB_tag[BTB_index] == pc_tag) && BTB_valid[BTB_index];
 
-assign PHTreadaddress_o = GHR ^ pc_i[NUM_GHR_BITS+1:2];
+assign PHTreadaddress_o = GHR ^ pc_i[2+:NUM_GHR_BITS];
 
 wire is_branch = (op_i == instr_branch_op);
 wire is_jump   = (op_i == instr_jal_op) || (op_i == instr_jalr_op);
