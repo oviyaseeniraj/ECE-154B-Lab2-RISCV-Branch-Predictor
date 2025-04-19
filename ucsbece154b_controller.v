@@ -112,12 +112,12 @@ assign {RegWriteD,
         //         ;
         //     `endif  
        endcase
-    default: 
-      `ifdef SIM
-          //$warning("Unsupported ALUop given: %h", ALUOpD);
-      `else
-          ;
-      `endif   
+   //  default: 
+   //    `ifdef SIM
+   //        //$warning("Unsupported ALUop given: %h", ALUOpD);
+   //    `else
+   //        ;
+   //    `endif   
    endcase
  end
 
