@@ -20,6 +20,24 @@ module ucsbece154b_branch #(
 
 `include "ucsbece154b_defines.vh"
 
+// CONTEXT: BTB
+// BTB is a branch target buffer that stores the target address of branch instructions
+// it is used to predict the target address of a branch instruction before it is executed
+// 2-way set associative table with 32 entries, each entry has a target address and a tag
+// we index into the BTB using the lower bits of the PC address and check if the tag matches
+// if it does, we check if the entry is valid (i.e., if it is a jump or branch instruction)
+// if it is, we return the target address and the prediction (taken or not taken)
+// if it is not, we return a default value (0) and not taken prediction
+
+// CONTEXT: Gshare predictor
+// Gshare is a branch predictor that uses global history to predict the outcome of branch instructions
+// the taken or not taken prediction is based on the PHT (Pattern History Table) which is indexed using the GHR (Global History Register)
+// the PHT is a 2-bit saturating counter that predicts the outcome of the branch instruction based on the GHR value
+// the saturating counter values are 00 (strongly not taken), 01 (weakly not taken), 10 (weakly taken), and 11 (strongly taken)
+// the PHT is indexed using the XOR of the GHR and the lower bits of the PC address
+// the PHT is updated with the outcome of the branch instruction (taken or not taken) and the GHR is updated with the outcome of the last branch instruction
+// the GHR is a shift register that shifts in the outcome of the last branch instruction
+
 // BTB implementation
 reg [31:0] BTB_target   [0:NUM_BTB_ENTRIES-1];
 reg [31:0] BTB_tag      [0:NUM_BTB_ENTRIES-1];
