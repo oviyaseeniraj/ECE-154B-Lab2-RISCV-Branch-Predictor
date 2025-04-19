@@ -34,9 +34,12 @@ module ucsbece154b_branch #(
 // the taken or not taken prediction is based on the PHT (Pattern History Table) which is indexed using the GHR (Global History Register)
 // the PHT is a 2-bit saturating counter that predicts the outcome of the branch instruction based on the GHR value
 // the saturating counter values are 00 (strongly not taken), 01 (weakly not taken), 10 (weakly taken), and 11 (strongly taken)
-// the PHT is indexed using the XOR of the GHR and the lower bits of the PC address
-// the PHT is updated with the outcome of the branch instruction (taken or not taken) and the GHR is updated with the outcome of the last branch instruction
+// the PHT is indexed using the XOR of the GHR and the lower bits of the PC address (given in lab instr)
 // the GHR is a shift register that shifts in the outcome of the last branch instruction
+// we have a 5 bit GHR so we can store the outcome of the last 5 branch instructions, LSB is the most recent and MSB is the oldest
+// train the predictor with the outcome of the last branch instruction
+// the PHT is updated with the outcome of the branch instruction (taken increments eg 01->10, not taken decrements eg 11->10)
+// the GHR is updated with the outcome of the last branch instruction (e.g. 10010 + taken = 00101)
 
 // BTB implementation
 reg [31:0] BTB_target   [0:NUM_BTB_ENTRIES-1];
