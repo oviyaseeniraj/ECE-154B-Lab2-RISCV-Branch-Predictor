@@ -38,7 +38,7 @@ wire is_branch = (top.riscv.dp.op_o == top.riscv.dp.instr_branch_op);
 wire is_jump = (top.riscv.dp.op_o == top.riscv.dp.instr_jal_op) || 
                (top.riscv.dp.op_o == top.riscv.dp.instr_jalr_op);
 wire predicted_taken = top.riscv.dp.BranchTakenF;
-wire actual_taken = top.riscv.controller.PCSrcE_o;
+wire actual_taken = top.riscv.c.PCSrcE_o;
 
 initial begin
     $display("=== Simulation Start ===");
@@ -62,12 +62,12 @@ initial begin
         cycle_count = cycle_count + 1;
         
         // Count instructions (simplified)
-        if (!top.riscv.controller.StallF_o) begin
+        if (!top.riscv.c.StallF_o) begin
             instruction_count = instruction_count + 1;
         end
         
         // Track predictions in execute stage
-        if (top.riscv.controller.FlushE_o) begin
+        if (top.riscv.c.FlushE_o) begin
             if (is_jump) begin
                 jump_count = jump_count + 1;
                 if (actual_taken !== predicted_taken) begin
