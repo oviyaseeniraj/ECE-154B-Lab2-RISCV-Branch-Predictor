@@ -66,7 +66,7 @@ wire is_branch = top.riscv.dp.op_o == top.riscv.dp.instr_branch_op;
 wire is_jump = (top.riscv.dp.op_o == top.riscv.dp.instr_jal_op) || 
                (top.riscv.dp.op_o == top.riscv.dp.instr_jalr_op);
 wire predicted_taken = top.riscv.dp.BranchTakenF;
-wire actual_taken = top.riscv.controller.PCSrcE_o;
+wire actual_taken = top.riscv.c.PCSrcE_o;
 
 // Main test sequence
 integer i;
