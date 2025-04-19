@@ -142,7 +142,36 @@ initial begin
     end
     
     $display("\nEnd simulation.");
-    $stop;
+    wait (reg_t3 == 10);  // Wait until outer loop completes
+
+    // Then print metrics
+    $display("\n=== Branch Prediction Metrics ===");
+    $display("Total cycles: %0d", cycle_count);
+    $display("Instructions executed: %0d", instruction_count);
+    if (instruction_count != 0) begin
+        $display("CPI: %.2f", real'(cycle_count)/instruction_count);
+    end
+
+    if (jump_count > 0) begin
+        $display("Jumps: %0d (%0d mispredictions, %.1f%% miss rate)", 
+                jump_count, jump_mispredict_count,
+                100.0*real'(jump_mispredict_count)/jump_count);
+    end
+
+    if (branch_count > 0) begin
+        $display("Branches: %0d (%0d mispredictions, %.1f%% miss rate)", 
+                branch_count, branch_mispredict_count,
+                100.0*real'(branch_mispredict_count)/branch_count);
+    end
+
+    $display("\nFinal Register Values:");
+    $display("t3 (outer): %0d", reg_t3);
+    $display("s0 (countx): %0d", reg_s0);
+    $display("s1 (county): %0d", reg_s1);
+    $display("s2 (countz): %0d", reg_s2);
+    $display("s3 (innercount): %0d", reg_s3);
+
+    $finish;  // Properly end simulation
 end
 
 endmodule
