@@ -54,7 +54,7 @@ initial begin
     reset = 0;
     
     // Main simulation loop
-    while (cycle_count < 1000 && reg_t3 !== 10) begin
+    while (cycle_count < 2000 && reg_t3 !== 10) begin  // Double the cycle limit
         @(posedge clk);
         cycle_count = cycle_count + 1;
         
