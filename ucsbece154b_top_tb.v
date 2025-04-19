@@ -12,6 +12,11 @@ ucsbece154b_top top (
     .reset(reset)
 );
 
+initial begin
+    defparam top.riscv.NUM_BTB_ENTRIES = 64;
+    defparam top.riscv.NUM_GHR_BITS = 6;
+end
+
 // Register file connections
 wire [31:0] reg_t3 = top.riscv.dp.rf.t3;
 
