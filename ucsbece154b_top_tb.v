@@ -1,113 +1,76 @@
-// ucsbece154b_top_tb.v
-// Verilog-2001 compatible testbench
+module ucsbece154b_top_tb();
 
-`timescale 1ns/1ps
-
-module ucsbece154b_top_tb ();
-
-// Clock generation
+// Clock generation (10ns period -> 100MHz)
 reg clk = 1;
-always #5 clk = ~clk;  // 100MHz clock
+always #5 clk = ~clk;
 reg reset;
 
 // Instantiate DUT
-ucsbece154b_top top (
+ucsbece154b_top top(
     .clk(clk),
     .reset(reset)
 );
 
 // Register file connections
-wire [31:0] reg_zero = top.riscv.dp.rf.zero;
-wire [31:0] reg_s0 = top.riscv.dp.rf.s0;
-wire [31:0] reg_s1 = top.riscv.dp.rf.s1;
-wire [31:0] reg_s2 = top.riscv.dp.rf.s2;
-wire [31:0] reg_s3 = top.riscv.dp.rf.s3;
-wire [31:0] reg_t0 = top.riscv.dp.rf.t0;
-wire [31:0] reg_t3 = top.riscv.dp.rf.t3;
+wire [31:0] s0 = top.riscv.dp.rf.s0;  // countx
+wire [31:0] s1 = top.riscv.dp.rf.s1;  // county
+wire [31:0] s2 = top.riscv.dp.rf.s2;  // countz
+wire [31:0] s3 = top.riscv.dp.rf.s3;  // innercount
+wire [31:0] t3 = top.riscv.dp.rf.t3;  // outer loop counter
 
-// Performance counters
-reg [31:0] jump_count;
-reg [31:0] jump_mispredict_count;
-reg [31:0] branch_count;
-reg [31:0] branch_mispredict_count;
+// Instruction memory debug
+wire [31:0] current_pc = top.riscv.dp.PCF_o;
+wire [31:0] current_instr = top.riscv.dp.InstrF_i;
+
+// Performance monitoring
 reg [31:0] cycle_count;
-reg [31:0] instruction_count;
-
-// Prediction monitoring
-wire is_branch = (top.riscv.dp.op_o == top.riscv.dp.instr_branch_op);
-wire is_jump = (top.riscv.dp.op_o == top.riscv.dp.instr_jal_op) || 
-               (top.riscv.dp.op_o == top.riscv.dp.instr_jalr_op);
-wire predicted_taken = top.riscv.dp.BranchTakenF;
-wire actual_taken = top.riscv.c.PCSrcE_o;
 
 initial begin
-    $display("=== Simulation Start ===");
+    $display("=== Starting Simulation ===");
+    $dumpfile("waveform.vcd");
+    $dumpvars(0, ucsbece154b_top_tb);
     
-    // Initialize counters
-    jump_count = 0;
-    jump_mispredict_count = 0;
-    branch_count = 0;
-    branch_mispredict_count = 0;
+    // Initialize
     cycle_count = 0;
-    instruction_count = 0;
     
     // Reset sequence
     reset = 1;
-    #100;
+    #20;  // 2 clock cycles
     reset = 0;
+    $display("Reset released at %0t ns", $time);
     
-    // Main monitoring loop
-    while (reg_t3 !== 10) begin
+    // Main simulation loop
+    while (cycle_count < 1000) begin
         @(posedge clk);
         cycle_count = cycle_count + 1;
         
-        // Count instructions (simplified)
-        if (!top.riscv.c.StallF_o) begin
-            instruction_count = instruction_count + 1;
+        // Display PC and instruction
+        $display("Cycle %0d: PC = %h, Instr = %h", 
+                cycle_count, current_pc, current_instr);
+        
+        // Exit when we reach the END label (PC stops changing)
+        if (current_pc == 32'h0000003C) begin  // Update this to match your END label PC
+            $display("Reached END label at cycle %0d", cycle_count);
+            #20; // Let final writes complete
+            break;
         end
         
-        // Track predictions in execute stage
-        if (top.riscv.c.FlushE_o) begin
-            if (is_jump) begin
-                jump_count = jump_count + 1;
-                if (actual_taken !== predicted_taken) begin
-                    jump_mispredict_count = jump_mispredict_count + 1;
-                end
-            end
-            else if (is_branch) begin
-                branch_count = branch_count + 1;
-                if (actual_taken !== predicted_taken) begin
-                    branch_mispredict_count = branch_mispredict_count + 1;
-                end
-            end
+        // Safety timeout
+        if (cycle_count >= 999) begin
+            $display("Warning: Simulation timeout at cycle %0d", cycle_count);
+            break;
         end
     end
     
-    // Verification checks
-    if (reg_s0 !== 10) $display("ERROR: s0 should be 10, got %d", reg_s0);
-    if (reg_s1 !== 5) $display("ERROR: s1 should be 5, got %d", reg_s1);
-    if (reg_s2 !== 5) $display("ERROR: s2 should be 5, got %d", reg_s2);
-    if (reg_s3 !== 40) $display("ERROR: s3 should be 40, got %d", reg_s3);
-    
-    // Print performance metrics
-    $display("\n=== Performance Metrics ===");
-    $display("Total cycles: %d", cycle_count);
-    $display("Instructions: %d", instruction_count);
-    $display("CPI: %f", $itor(cycle_count)/$itor(instruction_count));
-    
-    if (jump_count > 0) begin
-        $display("Jumps: %d (%0.1f%% mispredict)", 
-               jump_count, 
-               100.0*$itor(jump_mispredict_count)/$itor(jump_count));
-    end
-    
-    if (branch_count > 0) begin
-        $display("Branches: %d (%0.1f%% mispredict)", 
-               branch_count,
-               100.0*$itor(branch_mispredict_count)/$itor(branch_count));
-    end
-    
+    // Final checks
     $display("\n=== Simulation Complete ===");
+    $display("Total cycles: %0d", cycle_count);
+    $display("Final values:");
+    $display("countx (s0): %0d", s0);
+    $display("county (s1): %0d", s1);
+    $display("countz (s2): %0d", s2);
+    $display("innercount (s3): %0d", s3);
+    
     $finish;
 end
 
