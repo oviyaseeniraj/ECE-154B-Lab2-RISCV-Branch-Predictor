@@ -18,17 +18,11 @@ wire [31:0] s2 = top.riscv.dp.rf.s2;  // countz
 wire [31:0] s3 = top.riscv.dp.rf.s3;  // innercount
 wire [31:0] t3 = top.riscv.dp.rf.t3;  // outer loop counter
 
-// Instruction memory debug
-wire [31:0] current_pc = top.riscv.dp.PCF_o;
-wire [31:0] current_instr = top.riscv.dp.InstrF_i;
-
 // Performance monitoring
 reg [31:0] cycle_count;
 
 initial begin
     $display("=== Starting Simulation ===");
-    $dumpfile("waveform.vcd");
-    $dumpvars(0, ucsbece154b_top_tb);
     
     // Initialize
     cycle_count = 0;
@@ -37,41 +31,47 @@ initial begin
     reset = 1;
     #20;  // 2 clock cycles
     reset = 0;
-    $display("Reset released at %0t ns", $time);
     
     // Main simulation loop
-    while (cycle_count < 1000) begin
+    while (cycle_count < 1000 && t3 != 10) begin
         @(posedge clk);
         cycle_count = cycle_count + 1;
         
-        // Display PC and instruction
-        $display("Cycle %0d: PC = %h, Instr = %h", 
-                cycle_count, current_pc, current_instr);
-        
-        // Exit when we reach the END label (PC stops changing)
-        if (current_pc == 32'h0000003C) begin  // Update this to match your END label PC
-            $display("Reached END label at cycle %0d", cycle_count);
-            #20; // Let final writes complete
-            break;
-        end
-        
-        // Safety timeout
-        if (cycle_count >= 999) begin
-            $display("Warning: Simulation timeout at cycle %0d", cycle_count);
-            break;
+        // Progress reporting
+        if (cycle_count % 50 == 0) begin
+            $display("Cycle: %d, Outer Loop (t3): %d", cycle_count, t3);
         end
     end
     
     // Final checks
     $display("\n=== Simulation Complete ===");
-    $display("Total cycles: %0d", cycle_count);
+    $display("Total cycles: %d", cycle_count);
     $display("Final values:");
-    $display("countx (s0): %0d", s0);
-    $display("county (s1): %0d", s1);
-    $display("countz (s2): %0d", s2);
-    $display("innercount (s3): %0d", s3);
+    $display("countx (s0): %d", s0);
+    $display("county (s1): %d", s1);
+    $display("countz (s2): %d", s2);
+    $display("innercount (s3): %d", s3);
+    
+    // Expected values based on your assembly code
+    $display("\nExpected values:");
+    $display("countx (s0): 10 (should equal outer loop iterations)");
+    $display("county (s1): 5 (should be half of outer iterations)");
+    $display("countz (s2): 5 (x&y when both are 1)");
+    $display("innercount (s3): 40 (10 outer * 4 inner)");
+    
+    // Verification
+    if (s0 != 10) $display("ERROR: countx should be 10");
+    if (s1 != 5) $display("ERROR: county should be 5");
+    if (s2 != 5) $display("ERROR: countz should be 5");
+    if (s3 != 40) $display("ERROR: innercount should be 40");
     
     $finish;
+end
+
+// Waveform dumping
+initial begin
+    $dumpfile("waveform.vcd");
+    $dumpvars(0, ucsbece154b_top_tb);
 end
 
 endmodule
