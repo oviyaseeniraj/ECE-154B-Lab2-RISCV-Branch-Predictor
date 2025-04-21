@@ -24,6 +24,14 @@ wire [31:0] current_instr = top.riscv.dp.InstrF_i;
 
 // Performance monitoring
 reg [31:0] cycle_count;
+reg [31:0] instruction_count;
+
+// Prediction monitoring
+wire is_branch = (top.riscv.dp.op_o == top.riscv.dp.instr_branch_op);
+wire is_jump = (top.riscv.dp.op_o == top.riscv.dp.instr_jal_op) || 
+               (top.riscv.dp.op_o == top.riscv.dp.instr_jalr_op);
+wire predicted_taken = top.riscv.dp.BranchTakenF;
+wire actual_taken = top.riscv.c.PCSrcE_o;
 
 initial begin
     $display("=== Starting Simulation ===");
@@ -44,21 +52,25 @@ initial begin
         @(posedge clk);
         cycle_count = cycle_count + 1;
         
-        // Display PC and instruction
-        $display("Cycle %0d: PC = %h, Instr = %h", 
-                cycle_count, current_pc, current_instr);
-        
-        // Exit when we reach the END label (PC stops changing)
-        if (current_pc == 32'h0000003C) begin  // Update this to match your END label PC
-            $display("Reached END label at cycle %0d", cycle_count);
-            #20; // Let final writes complete
-            break;
+        // Count instructions (simplified)
+        if (!top.riscv.c.StallF_o) begin
+            instruction_count = instruction_count + 1;
         end
         
-        // Safety timeout
-        if (cycle_count >= 999) begin
-            $display("Warning: Simulation timeout at cycle %0d", cycle_count);
-            break;
+        // Track predictions in execute stage
+        if (top.riscv.c.FlushE_o) begin
+            if (is_jump) begin
+                jump_count = jump_count + 1;
+                if (actual_taken !== predicted_taken) begin
+                    jump_mispredict_count = jump_mispredict_count + 1;
+                end
+            end
+            else if (is_branch) begin
+                branch_count = branch_count + 1;
+                if (actual_taken !== predicted_taken) begin
+                    branch_mispredict_count = branch_mispredict_count + 1;
+                end
+            end
         end
     end
     
