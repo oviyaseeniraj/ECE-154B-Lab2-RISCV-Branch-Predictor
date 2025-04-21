@@ -64,15 +64,21 @@ initial begin
         end
         
         // Track predictions in execute stage
+        if (is_jump) begin
+            jump_count = jump_count + 1;
+        end
+
+        if (is_branch) begin
+            branch_count = branch_count + 1;
+        end
+
         if (top.riscv.c.FlushE_o) begin
             if (is_jump) begin
-                jump_count = jump_count + 1;
                 if (actual_taken !== predicted_taken) begin
                     jump_mispredict_count = jump_mispredict_count + 1;
                 end
             end
             else if (is_branch) begin
-                branch_count = branch_count + 1;
                 if (actual_taken !== predicted_taken) begin
                     branch_mispredict_count = branch_mispredict_count + 1;
                 end
