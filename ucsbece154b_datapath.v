@@ -134,9 +134,13 @@ always @ (posedge clk) begin
     end 
 end
 
+// Branch Predictor Update Logic
+assign is_branchD = (op_o == instr_branch_op);
+assign is_jumpD = (op_o == instr_jal_op) || (op_o == instr_jalr_op); // not sure if this will work the "instr" pieces are from controller, also defined branch and jump there
 
 // ***** EXECUTE STAGE ******************************
 reg [31:0] RD1E, RD2E, PCPlus4E, ExtImmE, PCE; 
+reg is_branchE, is_jumpE;
 reg [31:0] ForwardDataM;
 
 // Forwarding muxes 
@@ -182,8 +186,6 @@ ucsbece154b_alu alu (
 );
 
 // Branch Predictor Update Logic
-assign is_branchE = (op_o == instr_branch_op);
-assign is_jumpE = (op_o == instr_jal_op) || (op_o == instr_jalr_op); // not sure if this will work the "instr" pieces are from controller, also defined branch and jump there
 assign BTBwritedataE = {PCE[31:$clog2(NUM_BTB_ENTRIES)+2], ALUResultE, is_jumpE, is_branchE};
 assign BTBwriteaddressE = PCE[$clog2(NUM_BTB_ENTRIES)+1:2];
 assign BTBweE = (is_jumpE || (is_branchE && PCSrcE_i));
@@ -207,6 +209,8 @@ always @ (posedge clk) begin
         Rs1E_o   <=  5'b0;
         Rs2E_o   <=  5'b0;
         RdE_o    <=  5'b0;
+        is_branchE <= 1'b0;
+        is_jumpE   <= 1'b0;
     end else begin 
         RD1E     <= RD1D;
         RD2E     <= RD2D;
@@ -216,6 +220,8 @@ always @ (posedge clk) begin
         Rs1E_o   <= Rs1D_o;
         Rs2E_o   <= Rs2D_o;
         RdE_o    <= RdD;
+        is_branchE <= is_branchD;
+        is_jumpE   <= is_jumpD;
     end 
 end
 
