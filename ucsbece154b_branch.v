@@ -31,7 +31,7 @@ module ucsbece154b_branch #(
 
 // CONTEXT: Gshare predictor
 // Gshare is a branch predictor that uses global history to predict the outcome of branch instructions
-// the taken or not taken prediction is based on the PHT (Pattern History Table) which is indexed using the GHR (Global History Register)
+// the taken or not taken prediction is based on the PHT (Prediction History Table) which is indexed using the GHR (Global History Register)
 // the PHT is a 2-bit saturating counter that predicts the outcome of the branch instruction based on the GHR value
 // the saturating counter values are 00 (strongly not taken), 01 (weakly not taken), 10 (weakly taken), and 11 (strongly taken)
 // the PHT is indexed using the XOR of the GHR and the lower bits of the PC address (given in lab instr)
