@@ -72,7 +72,7 @@ always @(posedge clk) begin
 end
 
 always @(posedge clk) begin
-    end else if (PHTwe_i) begin
+    if (PHTwe_i) begin
         if (PHTincrement_i && PHT[PHTwriteaddress_i] < 2'b11)
             PHT[PHTwriteaddress_i] <= PHT[PHTwriteaddress_i] + 1;
         else if (!PHTincrement_i && PHT[PHTwriteaddress_i] > 2'b00)
