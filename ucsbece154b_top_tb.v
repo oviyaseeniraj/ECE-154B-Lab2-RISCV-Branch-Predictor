@@ -1,7 +1,5 @@
 `define SIM
 
-`define ASSERT(CONDITION, MESSAGE) if ((CONDITION)==1'b1); else begin $error($sformatf MESSAGE); end
-
 module ucsbece154b_top_tb ();
 
 reg clk = 1;
@@ -12,11 +10,10 @@ ucsbece154b_top top (
     .clk(clk), .reset(reset)
 );
 
-// Register aliases
-wire [31:0] reg_s0 = top.riscv.dp.rf.s0;  // countx
-wire [31:0] reg_s1 = top.riscv.dp.rf.s1;  // county
-wire [31:0] reg_s2 = top.riscv.dp.rf.s2;  // countz
-wire [31:0] reg_s3 = top.riscv.dp.rf.s3;  // innercount
+wire [31:0] reg_s0 = top.riscv.dp.rf.s0;
+wire [31:0] reg_s1 = top.riscv.dp.rf.s1;
+wire [31:0] reg_s2 = top.riscv.dp.rf.s2;
+wire [31:0] reg_s3 = top.riscv.dp.rf.s3;
 wire [31:0] reg_t0 = top.riscv.dp.rf.t0;
 wire [31:0] reg_t1 = top.riscv.dp.rf.t1;
 wire [31:0] reg_t2 = top.riscv.dp.rf.t2;
@@ -25,7 +22,6 @@ wire [31:0] reg_t4 = top.riscv.dp.rf.t4;
 wire [31:0] reg_t5 = top.riscv.dp.rf.t5;
 wire [31:0] reg_t6 = top.riscv.dp.rf.t6;
 
-// Performance counters
 integer cycle_count;
 integer instruction_count;
 integer branch_count, branch_miss_count;
@@ -50,26 +46,28 @@ initial begin
         @(negedge clk);
         cycle_count = cycle_count + 1;
 
-        // Count an instruction if we're not in reset and the fetch stage is valid
         if (!reset && top.riscv.dp.InstrD !== 32'b0) begin
             instruction_count = instruction_count + 1;
+
+            case (top.riscv.dp.op_o)
+                7'b1100011: begin // branch
+                    branch_count = branch_count + 1;
+                    if (top.riscv.dp.BranchTakenF !== top.riscv.dp.ZeroE_o)
+                        branch_miss_count = branch_miss_count + 1;
+                    $display("[BRANCH] PC=%h TakenF=%b ZeroE=%b MISP=%b", 
+                        top.riscv.dp.PCF_o, top.riscv.dp.BranchTakenF, top.riscv.dp.ZeroE_o,
+                        top.riscv.dp.BranchTakenF !== top.riscv.dp.ZeroE_o);
+                end
+                7'b1101111, 7'b1100111: begin // jal / jalr
+                    jump_count = jump_count + 1;
+                    if (!top.riscv.dp.BranchTakenF)
+                        jump_miss_count = jump_miss_count + 1;
+                    $display("[JUMP] PC=%h TakenF=%b MISP=%b", 
+                        top.riscv.dp.PCF_o, top.riscv.dp.BranchTakenF, !top.riscv.dp.BranchTakenF);
+                end
+            endcase
         end
 
-        // Performance tracking
-        case (top.riscv.dp.op_o)
-            7'b1100011: begin // branch
-                branch_count = branch_count + 1;
-                if (top.riscv.dp.BranchTakenF !== top.riscv.dp.ZeroE_o)
-                    branch_miss_count = branch_miss_count + 1;
-            end
-            7'b1101111, 7'b1100111: begin // jal / jalr
-                jump_count = jump_count + 1;
-                if (!top.riscv.dp.BranchTakenF)
-                    jump_miss_count = jump_miss_count + 1;
-            end
-        endcase
-
-        // Stop condition: loop ends when t3 == 10
         if (reg_t3 == 10) begin
             $display("---- PROGRAM COMPLETE ----");
             $display("Register values:");
@@ -103,5 +101,3 @@ initial begin
 end
 
 endmodule
-
-`undef ASSERT
