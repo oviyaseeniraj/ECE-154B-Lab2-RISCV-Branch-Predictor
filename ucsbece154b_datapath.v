@@ -174,6 +174,9 @@ always @(*) begin
     PHTweE         = (op_o == instr_branch_op);
     PHTincE        = (op_o == instr_branch_op && ZeroE_o == 1'b0);
     GHRresetE      = (op_o == instr_branch_op) && (BranchTakenF != ~ZeroE_o);
+
+    $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
+        BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);
 end
 
 always @ (posedge clk) begin
