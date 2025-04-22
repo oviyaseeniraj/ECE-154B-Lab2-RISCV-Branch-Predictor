@@ -39,13 +39,13 @@ always @(posedge clk) begin
     $display("[BTB INDEX] index=%0d", btb_index);
     $display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
     $display("[BTB TAG FROM TABLE] tag=%h", BTB_tag[btb_index]);
-    if (BTB_tag[btb_index] == 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx) begin
+    if (BTB_tag[BTBwriteaddress_i] == 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx) begin
         tag_match <= 1'b0;
     end else begin
-        tag_match <= BTB_valid[btb_index] && (BTB_tag[btb_index] == btb_tag_in);
+        tag_match <= BTB_valid[BTBwriteaddress_i] && (BTB_tag[BTBwriteaddress_i] == btb_tag_in);
     end
     $display("[BTB TAG MATCH] match=%b", tag_match);
-    btb_entry_valid <= BTB_valid[btb_index];
+    btb_entry_valid <= BTB_valid[BTBwriteaddress_i];
 
     if (BTB_we) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
