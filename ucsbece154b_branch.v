@@ -66,7 +66,6 @@ always @(posedge clk) begin
     end
 
     $display("[BTB TAG MATCH] match=%b", tag_match);
-    btb_entry_valid <= BTB_valid[btb_index];
 
     if (BTB_we && !tag_match_e) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
@@ -98,7 +97,7 @@ wire [31:0] btb_target_bypass = (BTB_we && BTBwriteaddress_i == btb_index) ?
 
 always @(*) begin
     tag_match <= BTB_valid[btb_index] && (btb_tag_in == BTB_tag[btb_index]);
-    if (tag_match && btb_entry_valid) begin
+    if (tag_match && BTB_valid[btb_index]) begin
         BTBtarget_o = btb_target_bypass;
         BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || BTB_j_flag[btb_index];
     end else begin
