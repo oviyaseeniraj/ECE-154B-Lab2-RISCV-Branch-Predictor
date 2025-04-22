@@ -10,10 +10,7 @@ parameter BTB_ENTRIES = 32;
 parameter GHR_BITS = 5;
 
 // Instantiate DUT
-ucsbece154b_top #(
-    .NUM_BTB_ENTRIES(BTB_ENTRIES),
-    .NUM_GHR_BITS(GHR_BITS)
-) top(
+ucsbece154b_top top(
     .clk(clk),
     .reset(reset)
 );
