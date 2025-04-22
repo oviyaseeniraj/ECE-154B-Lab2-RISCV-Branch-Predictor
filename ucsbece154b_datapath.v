@@ -146,7 +146,7 @@ wire [$clog2(NUM_BTB_ENTRIES)-1:0] BTBwriteaddressE = PCD[$clog2(NUM_BTB_ENTRIES
 wire BTBweE = (is_jumpE || (is_branchE && PCSrcE_i));
 wire PHTweE = is_branchE;
 wire PHTincrementE = PCSrcE_i;
-wire GHRresetE = PCSrcE_i;
+wire GHRresetE = reset;
 
 assign PCTargetE = PCE + ExtImmE;
 
