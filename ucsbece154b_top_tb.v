@@ -77,8 +77,12 @@ initial begin
             endcase
         end
 
-        // Stop condition: loop ends when t3 == 10
-        if (top.riscv.dp.rf.t3 == 10) begin
+        // Stop condition
+        if (top.riscv.dp.op_o == 7'b1100011 &&  // branch opcode
+            top.riscv.dp.funct3_o == 3'b000 &&  // BEQ
+            top.riscv.dp.Rs1E_o == 5'b11100 &&  // x28 (t3)
+            top.riscv.dp.Rs2E_o == 5'b11101 &&  // x29 (t4)
+            top.riscv.dp.ZeroE_o == 1'b1) begin // branch taken
             $display("Final iteration completed. Ending simulation...");
             $display("Cycle count:            %0d", cycle_count);
             $display("Branch count:           %0d", branch_count);
