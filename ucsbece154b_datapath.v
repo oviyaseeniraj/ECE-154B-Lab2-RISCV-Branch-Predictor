@@ -35,6 +35,7 @@ module ucsbece154b_datapath (
 
 wire [31:0] PCTargetE;
 reg [31:0] ResultW;
+reg BranchTakenD;
 
 parameter NUM_BTB_ENTRIES = 16;
 parameter NUM_GHR_BITS = 4;
@@ -93,6 +94,7 @@ always @ (posedge clk) begin
         InstrD   <= InstrF_i;
         PCPlus4D <= PCPlus4F;
         PCD      <= PCF_o;
+        BranchTakenD <= BranchTakenF;
     end 
 end
 
