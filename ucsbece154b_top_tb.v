@@ -29,6 +29,9 @@ reg [31:0] btb_miss_count;
 wire is_branch = (top.riscv.dp.op_o == 7'b1100011);
 wire is_jump = ((top.riscv.dp.op_o == 7'b1101111) ||  // JAL
                (top.riscv.dp.op_o == 7'b1100111));   // JALR
+wire was_branch = (top.riscv.dp.op_d == 7'b1100011);
+wire was_jump = (top.riscv.dp.op_d == 7'b1101111) || 
+                          (top.riscv.dp.op_d == 7'b1100111);
 wire branch_resolved = is_branch && top.riscv.c.PCSrcE_o;
 wire branch_mispredict = is_branch && 
                        (top.riscv.c.PCSrcE_o != top.riscv.dp.BranchTakenF);
@@ -126,19 +129,23 @@ initial begin
             instr_count = instr_count + 1;
         
         // Branch tracking
-        if (is_branch && !reset && pc_e != 0) begin
+        if (is_branch) begin
             branch_count = branch_count + 1;
+            
+            if (btb_hit) btb_hit_count = btb_hit_count + 1;
+            else btb_miss_count = btb_miss_count + 1;
+        end
+
+        if (was_branch) begin
             if (branch_mispredict) begin
                 branch_mispredict_count = branch_mispredict_count + 1;
                 $display("Cycle %0d: Branch Misprediction at PC=%h (Predicted=%b, Actual=%b)",
                         cycle_count, pc_e, top.riscv.dp.BranchTakenF, top.riscv.c.PCSrcE_o);
             end
-            if (btb_hit) btb_hit_count = btb_hit_count + 1;
-            else btb_miss_count = btb_miss_count + 1;
         end
         
         // Jump tracking
-        if (is_jump && !reset && pc_e != 0) begin
+        if (is_jump) begin
             jump_count = jump_count + 1;
             if (jump_mispredict) begin
                 jump_mispredict_count = jump_mispredict_count + 1;
