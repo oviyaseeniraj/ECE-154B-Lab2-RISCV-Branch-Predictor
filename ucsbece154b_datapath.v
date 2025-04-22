@@ -36,8 +36,8 @@ module ucsbece154b_datapath (
 wire [31:0] PCTargetE;
 reg [31:0] ResultW;
 
-parameter NUM_BTB_ENTRIES = 16;
-parameter NUM_GHR_BITS = 4;
+parameter NUM_BTB_ENTRIES = 32;
+parameter NUM_GHR_BITS = 5;
 
 wire [31:0] BTBtargetF;
 wire BranchTakenF;
@@ -138,7 +138,7 @@ ucsbece154b_alu alu (
 
 wire is_branchE = (op_o == instr_branch_op);
 wire is_jumpE = (op_o == instr_jal_op) || (op_o == instr_jalr_op);
-wire [$clog2(NUM_BTB_ENTRIES)-1:0] BTBwriteaddressE = PCD[$clog2(NUM_BTB_ENTRIES)+1:2];
+wire [4:0] BTBwriteaddressE = PCD[$clog2(NUM_BTB_ENTRIES)+1:2];
 wire BTBweE = (is_jumpE || (is_branchE && PCSrcE_i));
 wire PHTweE = is_branchE;
 wire PHTincrementE = PCSrcE_i;
