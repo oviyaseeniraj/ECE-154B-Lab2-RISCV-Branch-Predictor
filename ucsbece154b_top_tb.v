@@ -143,7 +143,7 @@ initial begin
                         cycle_count, pc_e, top.riscv.dp.BranchTakenF, top.riscv.c.PCSrcE_o);
             end
         end
-        
+
         // Jump tracking
         if (is_jump) begin
             jump_count = jump_count + 1;
