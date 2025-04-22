@@ -39,7 +39,7 @@ reg btb_hit_f, btb_hit_d, btb_hit_e;
 // Branch predictor monitoring signals
 wire is_branch = (op_e == 7'b1100011);  // BEQ, BNE, etc.
 wire is_jump = ((op_e == 7'b1101111) ||  // JAL
-               (op_e == 7'b1100111);     // JALR
+               (op_e == 7'b1100111));     // JALR
 wire branch_resolved = is_branch && top.riscv.PCSrcE;
 wire branch_mispredict = is_branch && (top.riscv.PCSrcE != branch_taken_e);
 wire jump_mispredict = is_jump && !branch_taken_e;
