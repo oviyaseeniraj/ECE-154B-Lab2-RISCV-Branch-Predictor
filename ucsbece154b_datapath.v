@@ -51,7 +51,7 @@ reg [4:0] BTBwriteaddrE;
 reg [31:0] BTBwritedataE;
 
 // NEW: Branch predictor instantiation
-ucsbece154b_branch #(64, 6) branch_predictor (
+ucsbece154b_branch #(32, 5) branch_predictor (
     .clk(clk),
     .reset_i(reset),
     .pc_i(PCF_o),
