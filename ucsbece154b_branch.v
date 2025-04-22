@@ -39,7 +39,7 @@ always @(posedge clk) begin
     $display("[BTB INDEX] index=%0d", btb_index);
     $display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
     $display("[BTB TAG FROM TABLE] tag=%h", BTB_tag[btb_index]);
-    if (BTB_tag[btb_index] == x) begin
+    if (BTB_tag[btb_index] == 1'bx) begin
         tag_match = 1'b0;
     end else begin
         tag_match = BTB_valid[btb_index] && (BTB_tag[btb_index] == btb_tag_in);
