@@ -42,7 +42,8 @@ reg [31:0] ResultW;
 // NEW: Internal signals for branch predictor
 wire [31:0] BTBtargetF;
 wire BranchTakenF;
-wire [4:0] PHTreadaddrF, PHTwriteaddrE;
+wire [4:0] PHTreadaddrF;     // output from branch predictor
+reg  [4:0] PHTwriteaddrE;    // NEW: FIXED — now legal to assign bc reg not wire
 reg PHTweE, PHTincE;
 reg GHRresetE;
 reg BTBweE;
