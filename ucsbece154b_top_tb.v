@@ -77,7 +77,7 @@ initial begin
         end
 
         // Stop condition: loop ends when t0 == 16
-        if (reg_t0 == reg_t1) begin
+        if (top.riscv.dp.rf.t3 == 10) begin
             $display("Final iteration completed. Ending simulation...");
             $display("Cycle count:            %0d", cycle_count);
             $display("Branch count:           %0d", branch_count);
