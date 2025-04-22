@@ -76,9 +76,9 @@ initial begin
             endcase
         end
 
-        // Stop condition: last instruction (addi x0, x0, 0) reaches WB
-        if (top.riscv.dp.ALUResultW === last_instr) begin
-            $display("Final instruction reached. Ending simulation...");
+        // Stop condition: loop ends when t0 == 16
+        if (top.riscv.dp.rf.t0 == 16) begin
+            $display("Final iteration completed. Ending simulation...");
             $display("Cycle count:            %0d", cycle_count);
             $display("Branch count:           %0d", branch_count);
             $display("Branch mispredictions:  %0d", branch_miss_count);
@@ -91,6 +91,7 @@ initial begin
                 $display("Jump misprediction rate:   %0f%%", 100.0 * jump_miss_count / jump_count);
             $stop;
         end
+
     end
 end
 
