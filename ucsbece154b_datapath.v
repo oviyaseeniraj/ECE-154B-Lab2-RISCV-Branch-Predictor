@@ -169,11 +169,11 @@ ucsbece154b_alu alu (
 always @(*) begin
     BTBwriteaddrE  = PCE[6:2];
     BTBwritedataE  = PCTargetE;
-    BTBweE         = (op_o == instr_branch_op && BranchTakenF) || (op_o == instr_jal_op) || (op_o == instr_jalr_op);
+    BTBweE         = ((op_o == instr_branch_op && ZeroE_o == 1'b0) || op_o == instr_jal_op || op_o == instr_jalr_op);
     PHTwriteaddrE  = PHTreadaddrF;
     PHTweE         = (op_o == instr_branch_op);
     PHTincE        = (op_o == instr_branch_op && ZeroE_o == 1'b0);
-    GHRresetE      = (op_o == instr_branch_op) && (BranchTakenF != ZeroE_o);
+    GHRresetE      = (op_o == instr_branch_op) && (BranchTakenF != ~ZeroE_o);
 end
 
 always @ (posedge clk) begin
