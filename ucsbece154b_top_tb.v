@@ -63,7 +63,7 @@ initial begin
             end
         end else begin
             pc_stable_cycles = 0;
-            last_pc = top.riscv.dp.PCF;
+            last_pc = top.riscv.dp.PCF_o;
         end
 
         // EXECUTE stage inspection (keep your existing code)
