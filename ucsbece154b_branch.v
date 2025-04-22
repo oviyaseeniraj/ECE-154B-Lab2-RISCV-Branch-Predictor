@@ -40,12 +40,29 @@ always @(posedge clk) begin
     $display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
     $display("[BTB TAG FROM TABLE] tag=%h", BTB_tag[btb_index]);
     if (BTB_tag[btb_index] == 1'bx) begin
-        tag_match = 1'b0;
+        tag_match <= 1'b0;
     end else begin
-        tag_match = BTB_valid[btb_index] && (BTB_tag[btb_index] == btb_tag_in);
+        tag_match <= BTB_valid[btb_index] && (BTB_tag[btb_index] == btb_tag_in);
     end
     $display("[BTB TAG MATCH] match=%b", tag_match);
-    btb_entry_valid = BTB_valid[btb_index];
+    btb_entry_valid <= BTB_valid[btb_index];
+
+    if (BTB_we) begin
+        BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
+        BTB_tag[BTBwriteaddress_i]    <= pc_i;
+        BTB_j_flag[BTBwriteaddress_i] <= (op_i == instr_jal_op || op_i == instr_jalr_op);
+        BTB_b_flag[BTBwriteaddress_i] <= (op_i == instr_branch_op);
+        BTB_valid[BTBwriteaddress_i]  <= 1'b1;
+
+        $display("[BTB WRITE] index=%0d PC=%h target=%h op=%b j=%b b=%b", 
+                 BTBwriteaddress_i, pc_i, BTBwritedata_i, op_i, 
+                 (op_i == instr_jal_op || op_i == instr_jalr_op), 
+                 (op_i == instr_branch_op));
+        
+        $display("[BTB ENTRY] index=%0d tag=%h target=%h j=%b b=%b valid=%b",
+                 BTBwriteaddress_i, BTB_tag[BTBwriteaddress_i], BTB_target[BTBwriteaddress_i], 
+                 BTB_j_flag[BTBwriteaddress_i], BTB_b_flag[BTBwriteaddress_i], BTB_valid[BTBwriteaddress_i]);
+    end
 end
 
 
@@ -67,28 +84,6 @@ always @(*) begin
         BranchTaken_o = 1'b0;
     end
 end
-
-always @(posedge clk) begin
-    // print BTB tag match- TODO FIX MATCH = X ALWAYS
-    
-    if (BTB_we) begin
-        BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
-        BTB_tag[BTBwriteaddress_i]    <= pc_i;
-        BTB_j_flag[BTBwriteaddress_i] <= (op_i == instr_jal_op || op_i == instr_jalr_op);
-        BTB_b_flag[BTBwriteaddress_i] <= (op_i == instr_branch_op);
-        BTB_valid[BTBwriteaddress_i]  <= 1'b1;
-
-        $display("[BTB WRITE] index=%0d PC=%h target=%h op=%b j=%b b=%b", 
-                 BTBwriteaddress_i, pc_i, BTBwritedata_i, op_i, 
-                 (op_i == instr_jal_op || op_i == instr_jalr_op), 
-                 (op_i == instr_branch_op));
-        
-        $display("[BTB ENTRY] index=%0d tag=%h target=%h j=%b b=%b valid=%b",
-                 BTBwriteaddress_i, BTB_tag[BTBwriteaddress_i], BTB_target[BTBwriteaddress_i], 
-                 BTB_j_flag[BTBwriteaddress_i], BTB_b_flag[BTBwriteaddress_i], BTB_valid[BTBwriteaddress_i]);
-    end
-end
-
 always @(posedge clk) begin
     if (PHTwe_i) begin
         if (PHTincrement_i && PHT[PHTwriteaddress_i] < 2'b11)
