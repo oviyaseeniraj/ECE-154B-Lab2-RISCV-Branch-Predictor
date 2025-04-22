@@ -130,7 +130,7 @@ always @(posedge clk) begin
 
     $display("[BTB TAG MATCH] match=%b", tag_match);
 
-    if (BTB_we && !tag_match_e) begin
+    if (BTB_we && tag_e != BTB_tag[BTBwriteaddress_i]) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
         BTB_tag[BTBwriteaddress_i]    <= tag_e;
         BTB_j_flag[BTBwriteaddress_i] <= (op_i == instr_jal_op || op_i == instr_jalr_op);
