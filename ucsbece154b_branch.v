@@ -34,15 +34,19 @@ reg [1:0] PHT [0:(1 << NUM_GHR_BITS)-1];
 
 wire [BTB_IDX_BITS-1:0] btb_index = pc_i[BTB_IDX_BITS+1:2];
 wire [31:0] btb_tag_in = pc_i;
-reg tag_match, btb_entry_valid;
+reg tag_match = 0;
+reg btb_entry_valid = 0;
+BTB_valid[btb_index] <= 1'b0;
+BTB_tag[btb_index] <= 32'b0;
 always @(posedge clk) begin
     $display("[BTB INDEX] index=%0d", btb_index);
     $display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
     $display("[BTB TAG FROM TABLE] tag=%h", BTB_tag[btb_index]);
-    if (BTB_tag[btb_index] == 32'bxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx) begin
-        tag_match <= 1'b0;
+    tag_match <= BTB_valid[btb_index];
+    if (BTB_valid[btb_index]) begin
+        tag_match <= (btb_tag_in == BTB_tag[btb_index]);
     end else begin
-        tag_match <= BTB_valid[btb_index] && (BTB_tag[btb_index] == btb_tag_in);
+        tag_match <= 1'b0;
     end
     $display("[BTB TAG MATCH] match=%b", tag_match);
     btb_entry_valid <= BTB_valid[btb_index];
