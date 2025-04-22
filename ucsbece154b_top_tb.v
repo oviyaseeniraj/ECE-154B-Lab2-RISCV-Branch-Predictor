@@ -44,7 +44,7 @@ initial begin
         cycle_count = cycle_count + 1;
 
         // Check for program termination (PC stops changing)
-        if (top.riscv.dp.PCF == last_pc) begin
+        if (top.riscv.dp.PCF_o == last_pc) begin
             pc_stable_cycles = pc_stable_cycles + 1;
             if (pc_stable_cycles > 5) begin // PC stable for 5 cycles
                 $display("Program terminated. Ending simulation...");
