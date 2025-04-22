@@ -70,8 +70,8 @@ always @(posedge clk) begin
                  (op_i == instr_branch_op));
         
         $display("[BTB ENTRY] index=%0d tag=%h target=%h j=%b b=%b valid=%b",
-                 BTBwriteaddress_i, BTB_tag[writeaddress_i], BTB_target[writeaddress_i], 
-                 BTB_j_flag[writeaddress_i], BTB_b_flag[writeaddress_i], BTB_valid[writeaddress_i]);
+                 BTBwriteaddress_i, BTB_tag[BTBwriteaddress_i], BTB_target[BTBwriteaddress_i], 
+                 BTB_j_flag[BTBwriteaddress_i], BTB_b_flag[BTBwriteaddress_i], BTB_valid[BTBwriteaddress_i]);
     end
 end
 
