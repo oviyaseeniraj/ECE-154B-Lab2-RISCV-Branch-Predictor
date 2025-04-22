@@ -115,7 +115,7 @@ initial begin
             $display("Cycle %d: Updating PHT[%h] to %b (increment: %b)",
                     cycle_count,
                     top.riscv.dp.branch.PHTwriteaddress_i,
-                    top.riscv.dp.branch.PHT[top.riscv.branch.PHTwriteaddress_i],
+                    top.riscv.dp.branch.PHT[top.riscv.dp.branch.PHTwriteaddress_i],
                     top.riscv.dp.PHTincrementE);
         end
         if (top.riscv.dp.branch.BTB_we) begin

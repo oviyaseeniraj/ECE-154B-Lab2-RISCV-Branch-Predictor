@@ -177,7 +177,7 @@ end
 ucsbece154b_branch #(
     .NUM_BTB_ENTRIES(NUM_BTB_ENTRIES),
     .NUM_GHR_BITS(NUM_GHR_BITS)
-) branch_predictor (
+) branch (
     .clk(clk),
     .reset_i(reset),
     .pc_i(PCF_o),
