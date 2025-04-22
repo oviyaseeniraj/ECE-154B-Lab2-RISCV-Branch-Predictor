@@ -42,16 +42,16 @@ reg [31:0] ResultW;
 // NEW: Internal signals for branch predictor
 wire [31:0] BTBtargetF;
 wire BranchTakenF;
-wire [5:0] PHTreadaddrF;     // output from branch predictor
-reg  [5:0] PHTwriteaddrE;    // NEW: FIXED — now legal to assign bc reg not wire
+wire [9:0] PHTreadaddrF;     // output from branch predictor
+reg  [9:0] PHTwriteaddrE;    // NEW: FIXED — now legal to assign bc reg not wire
 reg PHTweE, PHTincE;
 reg GHRresetE;
 reg BTBweE;
-reg [5:0] BTBwriteaddrE;
+reg [9:0] BTBwriteaddrE;
 reg [31:0] BTBwritedataE;
 
 // NEW: Branch predictor instantiation
-ucsbece154b_branch #(64, 6) branch_predictor (
+ucsbece154b_branch #(1024, 10) branch_predictor (
     .clk(clk),
     .reset_i(reset),
     .pc_i(PCF_o),
@@ -167,7 +167,7 @@ ucsbece154b_alu alu (
 
 // Branch predictor control logic (NEW)
 always @(*) begin
-    BTBwriteaddrE  = PCE[7:2];
+    BTBwriteaddrE  = PCE[11:2];
     BTBwritedataE  = PCTargetE;
     BTBweE         = ((op_o == instr_branch_op && ZeroE_o == 1'b0) || op_o == instr_jal_op || op_o == instr_jalr_op);
     PHTwriteaddrE  = PHTreadaddrF;

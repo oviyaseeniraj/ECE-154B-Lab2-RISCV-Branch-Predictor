@@ -1,6 +1,6 @@
 module ucsbece154b_branch #(
-    parameter NUM_BTB_ENTRIES = 64,
-    parameter NUM_GHR_BITS    = 6
+    parameter NUM_BTB_ENTRIES = 1024,
+    parameter NUM_GHR_BITS    = 10
 ) (
     input               clk, 
     input               reset_i,
