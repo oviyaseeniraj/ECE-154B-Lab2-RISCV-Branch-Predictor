@@ -33,17 +33,20 @@ reg [NUM_GHR_BITS-1:0] GHR;
 reg [1:0] PHT [0:(1 << NUM_GHR_BITS)-1];
 
 wire [BTB_IDX_BITS-1:0] btb_index = pc_i[BTB_IDX_BITS+1:2];
-$display("[BTB INDEX] index=%0d", btb_index);
 wire [31:0] btb_tag_in = pc_i;
-$display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
-$display("[BTB TAG FROM TABLE] tag=%h", BTB_tag[btb_index]);
-wire tag_match;
-if (BTB_tag[btb_index] == x) begin
-    tag_match = 1'b0;
-end else begin
-    tag_match = BTB_valid[btb_index] && (BTB_tag[btb_index] == btb_tag_in);
+wire tag_match, btb_entry_valid;
+always @(posedge clk) begin
+    $display("[BTB INDEX] index=%0d", btb_index);
+    $display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
+    $display("[BTB TAG FROM TABLE] tag=%h", BTB_tag[btb_index]);
+    if (BTB_tag[btb_index] == x) begin
+        tag_match = 1'b0;
+    end else begin
+        tag_match = BTB_valid[btb_index] && (BTB_tag[btb_index] == btb_tag_in);
+    end
+    btb_entry_valid = BTB_valid[btb_index];
 end
-wire btb_entry_valid = BTB_valid[btb_index];
+
 
 wire [NUM_GHR_BITS-1:0] pc_xor_ghr = pc_i[NUM_GHR_BITS+1:2] ^ GHR;
 assign PHTreadaddress_o = pc_xor_ghr;
