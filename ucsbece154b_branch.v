@@ -38,10 +38,15 @@ reg tag_match = 1'b0;
 reg btb_entry_valid = 1'b0;
 
 reg [31:0] tag_d, tag_e;
+reg [31:0] tag_in_d, tag_in_e;
+
+assign tag_match_e = (tag_e == tag_in_e);
 
 always @(posedge clk) begin
     tag_d <= btb_tag_in;
     tag_e <= tag_d;
+    tag_in_d <= pc_i;
+    tag_in_e <= tag_in_d;
 end
 
 initial begin
@@ -62,7 +67,7 @@ always @(posedge clk) begin
     $display("[BTB TAG MATCH] match=%b", tag_match);
     btb_entry_valid <= BTB_valid[btb_index];
 
-    if (BTB_we && !tag_match) begin
+    if (BTB_we && !tag_match_e) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
         BTB_tag[BTBwriteaddress_i]    <= tag_e;
         BTB_j_flag[BTBwriteaddress_i] <= (op_i == instr_jal_op || op_i == instr_jalr_op);
