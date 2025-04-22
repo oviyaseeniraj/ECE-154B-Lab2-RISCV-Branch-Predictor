@@ -97,6 +97,7 @@ always @ (posedge clk) begin
 end
 
 reg [31:0] RD1E, RD2E, PCPlus4E, ExtImmE, PCE; 
+reg is_branchE, is_jumpE;
 reg [31:0] ForwardDataM;
 
 reg  [31:0] SrcAE;
@@ -136,8 +137,8 @@ ucsbece154b_alu alu (
     .zero_o(ZeroE_o)
 );
 
-wire is_branchE = (op_o == instr_branch_op);
-wire is_jumpE = (op_o == instr_jal_op) || (op_o == instr_jalr_op);
+wire is_branchD = (op_o == instr_branch_op);
+wire is_jumpD = (op_o == instr_jal_op) || (op_o == instr_jalr_op);
 wire [4:0] BTBwriteaddressE = PCD[$clog2(NUM_BTB_ENTRIES)+1:2];
 wire BTBweE = (is_jumpE || (is_branchE && PCSrcE_i));
 wire PHTweE = is_branchE;
@@ -165,6 +166,8 @@ always @ (posedge clk) begin
         Rs1E_o   <= Rs1D_o;
         Rs2E_o   <= Rs2D_o;
         RdE_o    <= RdD;
+        is_branchE <= is_branchD;
+        is_jumpE  <= is_jumpD;
     end 
 end
 
