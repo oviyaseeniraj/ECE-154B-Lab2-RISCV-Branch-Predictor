@@ -36,8 +36,8 @@ module ucsbece154b_datapath (
 wire [31:0] PCTargetE;
 reg [31:0] ResultW;
 
-parameter NUM_BTB_ENTRIES = 64;
-parameter NUM_GHR_BITS = 6;
+parameter NUM_BTB_ENTRIES = 8;
+parameter NUM_GHR_BITS = 3;
 
 wire [31:0] BTBtargetF;
 wire BranchTakenF;
