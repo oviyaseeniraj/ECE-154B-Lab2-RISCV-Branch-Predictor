@@ -57,6 +57,9 @@ always @(*) begin
 end
 
 always @(posedge clk) begin
+    // print BTB tag match
+    $display("[BTB TAG MATCH] match=%b", 
+             tag_match);
     if (BTB_we && !tag_match) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
         BTB_tag[BTBwriteaddress_i]    <= pc_i;
