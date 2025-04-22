@@ -68,6 +68,10 @@ always @(posedge clk) begin
                  BTBwriteaddress_i, pc_i, BTBwritedata_i, op_i, 
                  (op_i == instr_jal_op || op_i == instr_jalr_op), 
                  (op_i == instr_branch_op));
+        
+        $display("[BTB ENTRY] index=%0d tag=%h target=%h j=%b b=%b valid=%b",
+                 BTBwriteaddress_i, BTB_tag[writeaddress_i], BTB_target[writeaddress_i], 
+                 BTB_j_flag[writeaddress_i], BTB_b_flag[writeaddress_i], BTB_valid[writeaddress_i]);
     end
 end
 
