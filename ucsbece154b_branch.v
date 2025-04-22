@@ -64,7 +64,7 @@ always @(posedge clk) begin
 
     if (BTB_we && !tag_match) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
-        BTB_tag[BTBwriteaddress_i]    <= pc_i;
+        BTB_tag[BTBwriteaddress_i]    <= tag_e;
         BTB_j_flag[BTBwriteaddress_i] <= (op_i == instr_jal_op || op_i == instr_jalr_op);
         BTB_b_flag[BTBwriteaddress_i] <= (op_i == instr_branch_op);
         BTB_valid[BTBwriteaddress_i]  <= 1'b1;
