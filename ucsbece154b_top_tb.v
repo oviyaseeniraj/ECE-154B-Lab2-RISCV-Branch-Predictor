@@ -65,14 +65,19 @@ initial begin
                         branch_miss_count = branch_miss_count + 1;
                 end
                 7'b1101111, 7'b1100111: begin // jal / jalr
-                    jump_count = jump_count + 1;
-                    if (!top.riscv.dp.BranchTakenF) // jump not predicted taken
+                jump_count = jump_count + 1;
+                    // For jumps, misprediction occurs if:
+                    // 1. Not predicted taken (should never happen), OR
+                    // 2. Target was wrong (compare BTBtargetF vs actual PC+offset)
+                    if (!top.riscv.dp.BranchTakenF || 
+                        (top.riscv.dp.BTBtargetF != (top.riscv.dp.PCF_o + top.riscv.dp.ExtImmE))) begin
                         jump_miss_count = jump_miss_count + 1;
+                    end
                 end
             endcase
         end
 
-        // Stop condition: loop ends when t0 == 16
+        // Stop condition: loop ends when t3 == 10
         if (top.riscv.dp.rf.t3 == 10) begin
             $display("Final iteration completed. Ending simulation...");
             $display("Cycle count:            %0d", cycle_count);
