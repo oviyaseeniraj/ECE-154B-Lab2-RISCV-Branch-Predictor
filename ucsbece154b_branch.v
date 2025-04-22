@@ -33,8 +33,16 @@ reg [NUM_GHR_BITS-1:0] GHR;
 reg [1:0] PHT [0:(1 << NUM_GHR_BITS)-1];
 
 wire [BTB_IDX_BITS-1:0] btb_index = pc_i[BTB_IDX_BITS+1:2];
+$display("[BTB INDEX] index=%0d", btb_index);
 wire [31:0] btb_tag_in = pc_i;
-wire tag_match = BTB_valid[btb_index] && (BTB_tag[btb_index] == btb_tag_in);
+$display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
+$display("[BTB TAG FROM TABLE] tag=%h", BTB_tag[btb_index]);
+wire tag_match;
+if (BTB_tag[btb_index] == x) begin
+    tag_match = 1'b0;
+end else begin
+    tag_match = BTB_valid[btb_index] && (BTB_tag[btb_index] == btb_tag_in);
+end
 wire btb_entry_valid = BTB_valid[btb_index];
 
 wire [NUM_GHR_BITS-1:0] pc_xor_ghr = pc_i[NUM_GHR_BITS+1:2] ^ GHR;
@@ -57,10 +65,11 @@ always @(*) begin
 end
 
 always @(posedge clk) begin
-    // print BTB tag match
+    // print BTB tag match- TODO FIX MATCH = X ALWAYS
     $display("[BTB TAG MATCH] match=%b", 
              tag_match);
-    if (BTB_we && !tag_match) begin
+    
+    if (BTB_we) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
         BTB_tag[BTBwriteaddress_i]    <= pc_i;
         BTB_j_flag[BTBwriteaddress_i] <= (op_i == instr_jal_op || op_i == instr_jalr_op);
