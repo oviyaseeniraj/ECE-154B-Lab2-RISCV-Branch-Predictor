@@ -66,11 +66,16 @@ assign PHTreadaddress_o = pc_xor_ghr;
 wire [1:0] pht_entry = PHT[pc_xor_ghr];
 wire predict_taken = pht_entry[1]; // MSB
 
-// Output assignments
+// Adding combinatorial bypass logic
+wire [31:0] btb_target_bypass = (BTB_we && (BTBwriteaddress_i == btb_index)) ? 
+                               BTBwritedata_i : BTB_target[btb_index];
+
+// Modified output assignment:
 always @(*) begin
     if (tag_match && valid) begin
-        BTBtarget_o = BTB_target[btb_index];
-        BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || BTB_j_flag[btb_index];
+        BTBtarget_o = btb_target_bypass;  // Use bypassed target if available
+        BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || 
+                       BTB_j_flag[btb_index];
     end else begin
         BTBtarget_o = 32'b0;
         BranchTaken_o = 1'b0;

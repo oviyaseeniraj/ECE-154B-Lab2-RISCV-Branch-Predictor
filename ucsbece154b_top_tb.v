@@ -69,8 +69,7 @@ initial begin
                     // For jumps, misprediction occurs if:
                     // 1. Not predicted taken (should never happen), OR
                     // 2. Target was wrong (compare BTBtargetF vs actual PC+offset)
-                    if (!top.riscv.dp.BranchTakenF || 
-                        (top.riscv.dp.BTBtargetF != (top.riscv.dp.PCF_o + top.riscv.dp.ExtImmE))) begin
+                    if (!BranchTakenF || (BTBtargetF != correct_target)) begin
                         jump_miss_count = jump_miss_count + 1;
                     end
                 end
