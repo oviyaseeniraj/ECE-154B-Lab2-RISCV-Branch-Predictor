@@ -41,7 +41,7 @@ reg [31:0] tag_d, tag_e;
 
 always @(posedge clk) begin
     tag_d <= btb_tag_in;
-    tag_e = tag_d;
+    tag_e <= tag_d;
 end
 
 initial begin
