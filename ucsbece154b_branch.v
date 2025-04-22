@@ -39,9 +39,7 @@ reg tag_match = 1'b0;
 reg btb_entry_valid = 1'b0;
 
 reg [31:0] tag_d, tag_e;
-reg [31:0] tag_in_d, tag_in_e;
-
-assign tag_match_e = (tag_e == tag_in_e);
+reg tag_match_d, tag_match_e;
 
 initial begin
     BTB_target[0] = 32'b0;
@@ -79,7 +77,7 @@ initial begin
     BTB_j_flag[5] = 1'b0;
     BTB_b_flag[5] = 1'b0;
     BTB_valid[5]  = 1'b0;
-    
+
     BTB_target[6] = 32'b0; BTB_tag[6] = 32'b0; BTB_j_flag[6] = 1'b0; BTB_b_flag[6] = 1'b0; BTB_valid[6] = 1'b0;
     BTB_target[7] = 32'b0; BTB_tag[7] = 32'b0; BTB_j_flag[7] = 1'b0; BTB_b_flag[7] = 1'b0; BTB_valid[7] = 1'b0;
     BTB_target[8] = 32'b0; BTB_tag[8] = 32'b0; BTB_j_flag[8] = 1'b0; BTB_b_flag[8] = 1'b0; BTB_valid[8] = 1'b0;
@@ -112,8 +110,11 @@ end
 always @(posedge clk) begin
     tag_d <= btb_tag_in;
     tag_e <= tag_d;
-    tag_in_d <= pc_i;
-    tag_in_e <= tag_in_d;
+end
+
+always @(posedge clk) begin
+    tag_match_d <= tag_match;
+    tag_match_e <= tag_match_d;
 end
 
 always @(posedge clk) begin
