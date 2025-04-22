@@ -32,8 +32,6 @@ module ucsbece154b_datapath (
 );
 
 `include "ucsbece154b_defines.vh"
-parameter NUM_GHR_BITS    = 6
-parameter NUM_BTB_ENTRIES = 64;
 
 // FIXED: Moved earlier to avoid undefined reference
 reg [31:0] PCE;           // Program counter in EX stage
@@ -44,12 +42,12 @@ reg [31:0] ResultW;
 // NEW: Internal signals for branch predictor
 wire [31:0] BTBtargetF;
 wire BranchTakenF;
-wire [NUM_GHR_BITS-1:0] PHTreadaddrF;     // output from branch predictor
-reg  [NUM_GHR_BITS-1:0] PHTwriteaddrE;    // NEW: FIXED — now legal to assign bc reg not wire
+wire [6-1:0] PHTreadaddrF;     // output from branch predictor
+reg  [6-1:0] PHTwriteaddrE;    // NEW: FIXED — now legal to assign bc reg not wire
 reg PHTweE, PHTincE;
 reg GHRresetE;
 reg BTBweE;
-reg [NUM_GHR_BITS-1:0] BTBwriteaddrE;
+reg [6-1:0] BTBwriteaddrE;
 reg [31:0] BTBwritedataE;
 
 // NEW: Branch predictor instantiation
