@@ -114,15 +114,15 @@ initial begin
         if (top.riscv.dp.PHTweE) begin
             $display("Cycle %d: Updating PHT[%h] to %b (increment: %b)",
                     cycle_count,
-                    top.riscv.branch.PHTwriteaddress_i,
-                    top.riscv.branch.PHT[top.riscv.branch.PHTwriteaddress_i],
+                    top.riscv.dp.branch.PHTwriteaddress_i,
+                    top.riscv.dp.branch.PHT[top.riscv.branch.PHTwriteaddress_i],
                     top.riscv.dp.PHTincrementE);
         end
-        if (top.riscv.dp.BTB_we) begin
+        if (top.riscv.dp.branch.BTB_we) begin
             $display("Cycle %d: Updating BTB[%h] with target %h",
                     cycle_count,
-                    top.riscv.branch.BTBwriteaddress_i,
-                    top.riscv.branch.BTBwritedata_i);
+                    top.riscv.dp.branch.BTBwriteaddress_i,
+                    top.riscv.dp.branch.BTBwritedata_i);
         end
         
         // Periodic reporting
