@@ -44,6 +44,7 @@ always @(posedge clk) begin
     end else begin
         tag_match = BTB_valid[btb_index] && (BTB_tag[btb_index] == btb_tag_in);
     end
+    $display("[BTB TAG MATCH] match=%b", tag_match);
     btb_entry_valid = BTB_valid[btb_index];
 end
 
@@ -69,8 +70,6 @@ end
 
 always @(posedge clk) begin
     // print BTB tag match- TODO FIX MATCH = X ALWAYS
-    $display("[BTB TAG MATCH] match=%b", 
-             tag_match);
     
     if (BTB_we) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
