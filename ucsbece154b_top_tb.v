@@ -66,8 +66,12 @@ initial begin
                 end
                 7'b1101111, 7'b1100111: begin // jal / jalr
                     jump_count = jump_count + 1;
-                    if (top.riscv.dp.BranchTakenF != 1'b1) // predicted not taken
-                        jump_miss_count = jump_miss_count + 1;
+                    if (top.riscv.dp.op_o == 7'b1101111 || top.riscv.dp.op_o == 7'b1100111) begin
+                        jump_count = jump_count + 1;
+                        if (!top.riscv.dp.BranchTakenF) // jump not predicted taken
+                            jump_miss_count = jump_miss_count + 1;
+                    end
+
                 end
             endcase
         end
