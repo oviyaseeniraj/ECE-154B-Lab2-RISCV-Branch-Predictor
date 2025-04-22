@@ -1,77 +1,95 @@
-module ucsbece154b_top_tb();
+`define SIM
 
-// Clock generation (10ns period -> 100MHz)
+`define ASSERT(CONDITION, MESSAGE) if ((CONDITION)==1'b1); else begin $error($sformatf MESSAGE); end
+
+module ucsbece154b_top_tb ();
+
 reg clk = 1;
-always #5 clk = ~clk;
+always #1 clk <= ~clk;
 reg reset;
 
-// Instantiate DUT
-ucsbece154b_top top(
-    .clk(clk),
-    .reset(reset)
+ucsbece154b_top top (
+    .clk(clk), .reset(reset)
 );
 
-// Register file connections
-wire [31:0] s0 = top.riscv.dp.rf.s0;  // countx
-wire [31:0] s1 = top.riscv.dp.rf.s1;  // county
-wire [31:0] s2 = top.riscv.dp.rf.s2;  // countz
-wire [31:0] s3 = top.riscv.dp.rf.s3;  // innercount
-wire [31:0] t3 = top.riscv.dp.rf.t3;  // outer loop counter
+// Register aliases
+wire [31:0] reg_zero = top.riscv.dp.rf.zero;
+wire [31:0] reg_ra = top.riscv.dp.rf.ra;
+wire [31:0] reg_sp = top.riscv.dp.rf.sp;
+wire [31:0] reg_gp = top.riscv.dp.rf.gp;
+wire [31:0] reg_tp = top.riscv.dp.rf.tp;
+wire [31:0] reg_t0 = top.riscv.dp.rf.t0;
+wire [31:0] reg_t1 = top.riscv.dp.rf.t1;
+wire [31:0] reg_t2 = top.riscv.dp.rf.t2;
+wire [31:0] reg_s0 = top.riscv.dp.rf.s0;
+wire [31:0] reg_s1 = top.riscv.dp.rf.s1;
+wire [31:0] reg_a0 = top.riscv.dp.rf.a0;
+wire [31:0] reg_s2 = top.riscv.dp.rf.s2;
+wire [31:0] reg_s3 = top.riscv.dp.rf.s3;
+wire [31:0] reg_a1 = top.riscv.dp.rf.a1;
 
-// Instruction memory debug
-wire [31:0] current_pc = top.riscv.dp.PCF_o;
-wire [31:0] current_instr = top.riscv.dp.InstrF_i;
+// Performance counters
+integer cycle_count;
+integer branch_count, branch_miss_count;
+integer jump_count, jump_miss_count;
 
-// Performance monitoring
-reg [31:0] cycle_count;
+reg [31:0] last_instr = 32'h00000013; // "addi x0, x0, 0"
 
 initial begin
-    $display("=== Starting Simulation ===");
-    $dumpfile("waveform.vcd");
-    $dumpvars(0, ucsbece154b_top_tb);
-    
-    // Initialize
-    cycle_count = 0;
-    
-    // Reset sequence
+    $display("Begin simulation.");
+
     reset = 1;
-    #20;  // 2 clock cycles
+    cycle_count = 0;
+    branch_count = 0;
+    branch_miss_count = 0;
+    jump_count = 0;
+    jump_miss_count = 0;
+
+    @(negedge clk); 
+    @(negedge clk);
     reset = 0;
-    $display("Reset released at %0t ns", $time);
-    
-    // Main simulation loop
-    while (cycle_count < 1000) begin
-        @(posedge clk);
+
+    forever begin
+        @(negedge clk);
         cycle_count = cycle_count + 1;
-        
-        // Display PC and instruction
-        $display("Cycle %0d: PC = %h, Instr = %h", 
-                cycle_count, current_pc, current_instr);
-        
-        // Exit when we reach the END label (PC stops changing)
-        if (current_pc == 32'h0000003C) begin  // Update this to match your END label PC
-            $display("Reached END label at cycle %0d", cycle_count);
-            #20; // Let final writes complete
-            break;
+
+        // EXECUTE stage inspection
+        // Top path: top.riscv.dp contains all signals
+
+        if (!reset) begin
+            // Check op code in Execute stage (InstrD delayed)
+            case (top.riscv.dp.op_o)
+                7'b1100011: begin // branch
+                    branch_count = branch_count + 1;
+                    if (top.riscv.dp.BranchTakenF != top.riscv.dp.ZeroE_o) // predicted != actual
+                        branch_miss_count = branch_miss_count + 1;
+                end
+                7'b1101111, 7'b1100111: begin // jal / jalr
+                    jump_count = jump_count + 1;
+                    if (top.riscv.dp.BranchTakenF != 1'b1) // predicted not taken
+                        jump_miss_count = jump_miss_count + 1;
+                end
+            endcase
         end
-        
-        // Safety timeout
-        if (cycle_count >= 999) begin
-            $display("Warning: Simulation timeout at cycle %0d", cycle_count);
-            break;
+
+        // Stop condition: last instruction (addi x0, x0, 0) reaches WB
+        if (top.riscv.dp.ALUResultW === last_instr) begin
+            $display("Final instruction reached. Ending simulation...");
+            $display("Cycle count:            %0d", cycle_count);
+            $display("Branch count:           %0d", branch_count);
+            $display("Branch mispredictions:  %0d", branch_miss_count);
+            $display("Jump count:             %0d", jump_count);
+            $display("Jump mispredictions:    %0d", jump_miss_count);
+
+            if (branch_count > 0)
+                $display("Branch misprediction rate: %0f%%", 100.0 * branch_miss_count / branch_count);
+            if (jump_count > 0)
+                $display("Jump misprediction rate:   %0f%%", 100.0 * jump_miss_count / jump_count);
+            $stop;
         end
     end
-    
-    // Final checks
-    $display("\n=== Simulation Complete ===");
-    $display("Total cycles: %0d", cycle_count);
-    $display("Final values:");
-    $display("countx (s0): %0d", s0);
-    $display("county (s1): %0d", s1);
-    $display("countz (s2): %0d", s2);
-    $display("innercount (s3): %0d", s3);
-    
-    $finish;
 end
 
 endmodule
+
+`undef ASSERT
