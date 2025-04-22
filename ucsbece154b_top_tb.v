@@ -69,15 +69,16 @@ initial begin
                     // For jumps, misprediction occurs if:
                     // 1. Not predicted taken (should never happen), OR
                     // 2. Target was wrong (compare BTBtargetF vs actual PC+offset)
-                    if (!BranchTakenF || (BTBtargetF != correct_target)) begin
+                    if (!top.riscv.dp.BranchTakenF || 
+                        (top.riscv.dp.BTBtargetF != (top.riscv.dp.PCF_o + top.riscv.dp.ExtImmE))) begin
                         jump_miss_count = jump_miss_count + 1;
                     end
                 end
             endcase
         end
 
-        // Stop condition
-        if (top.riscv.dp.rf.t3 == 10) begin // branch taken
+        // Stop condition: loop ends when t3 == 10
+        if (top.riscv.dp.rf.t3 == 10) begin
             $display("Final iteration completed. Ending simulation...");
             $display("Cycle count:            %0d", cycle_count);
             $display("Branch count:           %0d", branch_count);
