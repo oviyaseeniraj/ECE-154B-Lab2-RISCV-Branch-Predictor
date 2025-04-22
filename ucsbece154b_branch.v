@@ -110,7 +110,7 @@ always @(posedge clk) begin
 end
 
 always @(posedge clk) begin
-    if (reset_i) begin
+    if (reset_i || GHRreset_i) begin
         GHR <= {NUM_GHR_BITS{1'b0}};
     end else if (PHTwe_i) begin
         GHR <= {GHR[NUM_GHR_BITS-2:0], PHTincrement_i};
