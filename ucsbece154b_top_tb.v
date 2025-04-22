@@ -29,6 +29,11 @@ wire is_jump = top.riscv.dp.is_jumpE;
 wire predicted_taken = top.riscv.dp.BranchTakenD;
 wire actual_taken = top.riscv.c.PCSrcE_o;
 
+// Pipeline tracking registers
+reg is_branch_prev, is_jump_prev;
+reg predicted_taken_prev;
+reg [31:0] pc_prev;
+
 // Output file for data collection
 integer results_file;
 initial begin
@@ -46,6 +51,10 @@ initial begin
     jump_mispredict_count = 0;
     branch_count = 0;
     branch_mispredict_count = 0;
+    is_branch_prev = 0;
+    is_jump_prev = 0;
+    predicted_taken_prev = 0;
+    pc_prev = 0;
     
     // Reset sequence
     reset = 1;
@@ -62,26 +71,58 @@ initial begin
             instruction_count = instruction_count + 1;
         end
         
-        // Track predictions in execute stage
-        if (is_jump) begin
-            jump_count = jump_count + 1;
+        // Track instructions through pipeline
+        is_branch_prev <= is_branch;
+        is_jump_prev <= is_jump;
+        predicted_taken_prev <= predicted_taken;
+        pc_prev <= top.riscv.dp.PCF_o;
+        
+        // Check mispredictions one cycle after Execute
+        if (is_branch_prev) begin
+            branch_count <= branch_count + 1;
+            if (actual_taken !== predicted_taken_prev) begin
+                branch_mispredict_count <= branch_mispredict_count + 1;
+                $display("Branch misprediction at PC %h: Predicted %b, Actual %b",
+                         pc_prev, predicted_taken_prev, actual_taken);
+            end
         end
-
+        
+        if (is_jump_prev) begin
+            jump_count <= jump_count + 1;
+            if (actual_taken !== predicted_taken_prev) begin
+                jump_mispredict_count <= jump_mispredict_count + 1;
+                $display("Jump misprediction at PC %h: Predicted %b, Actual %b",
+                         pc_prev, predicted_taken_prev, actual_taken);
+            end
+        end
+        
+        // Debug prints
         if (is_branch) begin
-            branch_count = branch_count + 1;
+            $display("Cycle %d: Branch at PC %h: Predicted %b", 
+                    cycle_count, top.riscv.dp.PCF_o, predicted_taken);
         end
-
-        if (top.riscv.c.FlushE_o) begin
-            if (is_jump) begin
-                if (actual_taken !== predicted_taken) begin
-                    jump_mispredict_count = jump_mispredict_count + 1;
-                end
-            end
-            else if (is_branch) begin
-                if (actual_taken !== predicted_taken) begin
-                    branch_mispredict_count = branch_mispredict_count + 1;
-                end
-            end
+        if (is_jump) begin
+            $display("Cycle %d: Jump at PC %h: Predicted %b", 
+                    cycle_count, top.riscv.dp.PCF_o, predicted_taken);
+        end
+        if (actual_taken) begin
+            $display("Cycle %d: Taken at PC %h", 
+                    cycle_count, top.riscv.dp.PCE);
+        end
+        
+        // Predictor update debug
+        if (top.riscv.dp.PHTweE) begin
+            $display("Cycle %d: Updating PHT[%h] to %b (increment: %b)",
+                    cycle_count,
+                    top.riscv.dp.PHTwriteaddress_i,
+                    top.riscv.dp.PHT[top.riscv.dp.PHTwriteaddress_i],
+                    top.riscv.dp.PHTincrementE);
+        end
+        if (top.riscv.dp.BTB_we) begin
+            $display("Cycle %d: Updating BTB[%h] with target %h",
+                    cycle_count,
+                    top.riscv.dp.BTBwriteaddress_i,
+                    top.riscv.dp.BTBwritedata_i);
         end
         
         // Periodic reporting
