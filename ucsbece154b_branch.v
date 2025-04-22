@@ -34,8 +34,8 @@ reg [1:0] PHT [0:(1 << NUM_GHR_BITS)-1];
 
 wire [BTB_IDX_BITS-1:0] btb_index = pc_i[BTB_IDX_BITS+1:2];
 wire [31:0] btb_tag_in = pc_i;
-reg tag_match = 0;
-reg btb_entry_valid = 0;
+reg tag_match = 1'b0;
+reg btb_entry_valid = 1'b0;
 
 reg [31:0] tag_d, tag_e;
 
@@ -91,7 +91,7 @@ wire [31:0] btb_target_bypass = (BTB_we && BTBwriteaddress_i == btb_index) ?
                                 BTBwritedata_i : BTB_target[btb_index];
 
 always @(*) begin
-    //tag_match <= (btb_tag_in == BTB_tag[btb_index]);
+    tag_match <= (btb_tag_in == BTB_tag[btb_index]);
     if (tag_match && btb_entry_valid) begin
         BTBtarget_o = btb_target_bypass;
         BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || BTB_j_flag[btb_index];
