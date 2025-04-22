@@ -24,18 +24,25 @@ module ucsbece154b_branch #(
 localparam BTB_IDX_BITS = $clog2(NUM_BTB_ENTRIES);
 
 reg [31:0] BTB_target [0:NUM_BTB_ENTRIES-1];
-    reg [31:0] BTB_tag    [0:NUM_BTB_ENTRIES-1];
-    reg        BTB_j_flag [0:NUM_BTB_ENTRIES-1];
-    reg        BTB_b_flag [0:NUM_BTB_ENTRIES-1];
-    reg        BTB_valid  [0:NUM_BTB_ENTRIES-1];
+reg [31:0] BTB_tag    [0:NUM_BTB_ENTRIES-1];
+reg        BTB_j_flag [0:NUM_BTB_ENTRIES-1];
+reg        BTB_b_flag [0:NUM_BTB_ENTRIES-1];
+reg        BTB_valid  [0:NUM_BTB_ENTRIES-1];
 
-    reg [NUM_GHR_BITS-1:0] GHR;
-    reg [1:0] PHT [0:(1 << NUM_GHR_BITS)-1];
+reg [NUM_GHR_BITS-1:0] GHR;
+reg [1:0] PHT [0:(1 << NUM_GHR_BITS)-1];
 
-    wire [BTB_IDX_BITS-1:0] btb_index = pc_i[BTB_IDX_BITS+1:2];
-    wire [31:0] btb_tag_in = pc_i;
-    reg tag_match = 0;
-    reg btb_entry_valid = 0;
+wire [BTB_IDX_BITS-1:0] btb_index = pc_i[BTB_IDX_BITS+1:2];
+wire [31:0] btb_tag_in = pc_i;
+reg tag_match = 0;
+reg btb_entry_valid = 0;
+
+reg [31:0] tag_d, tag_e;
+
+always @(posedge clk) begin
+    tag_d <= btb_tag_in;
+    tag_e = tag_d;
+end
 
 initial begin
     BTB_valid[btb_index] = 1'b0;
@@ -55,7 +62,7 @@ always @(posedge clk) begin
     $display("[BTB TAG MATCH] match=%b", tag_match);
     btb_entry_valid <= BTB_valid[btb_index];
 
-    if (BTB_we) begin
+    if (BTB_we && !tag_match) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
         BTB_tag[BTBwriteaddress_i]    <= pc_i;
         BTB_j_flag[BTBwriteaddress_i] <= (op_i == instr_jal_op || op_i == instr_jalr_op);
@@ -84,6 +91,7 @@ wire [31:0] btb_target_bypass = (BTB_we && BTBwriteaddress_i == btb_index) ?
                                 BTBwritedata_i : BTB_target[btb_index];
 
 always @(*) begin
+    tag_match <= (btb_tag_in == BTB_tag[btb_index]);
     if (tag_match && btb_entry_valid) begin
         BTBtarget_o = btb_target_bypass;
         BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || BTB_j_flag[btb_index];
