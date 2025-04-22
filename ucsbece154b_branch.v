@@ -24,20 +24,24 @@ module ucsbece154b_branch #(
 localparam BTB_IDX_BITS = $clog2(NUM_BTB_ENTRIES);
 
 reg [31:0] BTB_target [0:NUM_BTB_ENTRIES-1];
-reg [31:0] BTB_tag    [0:NUM_BTB_ENTRIES-1];
-reg        BTB_j_flag [0:NUM_BTB_ENTRIES-1];
-reg        BTB_b_flag [0:NUM_BTB_ENTRIES-1];
-reg        BTB_valid  [0:NUM_BTB_ENTRIES-1];
+    reg [31:0] BTB_tag    [0:NUM_BTB_ENTRIES-1];
+    reg        BTB_j_flag [0:NUM_BTB_ENTRIES-1];
+    reg        BTB_b_flag [0:NUM_BTB_ENTRIES-1];
+    reg        BTB_valid  [0:NUM_BTB_ENTRIES-1];
 
-reg [NUM_GHR_BITS-1:0] GHR;
-reg [1:0] PHT [0:(1 << NUM_GHR_BITS)-1];
+    reg [NUM_GHR_BITS-1:0] GHR;
+    reg [1:0] PHT [0:(1 << NUM_GHR_BITS)-1];
 
-wire [BTB_IDX_BITS-1:0] btb_index = pc_i[BTB_IDX_BITS+1:2];
-wire [31:0] btb_tag_in = pc_i;
-reg tag_match = 0;
-reg btb_entry_valid = 0;
-BTB_valid[btb_index] = 1'b0;
-BTB_tag[btb_index] = 32'b0;
+    wire [BTB_IDX_BITS-1:0] btb_index = pc_i[BTB_IDX_BITS+1:2];
+    wire [31:0] btb_tag_in = pc_i;
+    reg tag_match = 0;
+    reg btb_entry_valid = 0;
+
+initial begin
+    BTB_valid[btb_index] = 1'b0;
+    BTB_tag[btb_index] = 32'b0;
+end
+
 always @(posedge clk) begin
     $display("[BTB INDEX] index=%0d", btb_index);
     $display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
