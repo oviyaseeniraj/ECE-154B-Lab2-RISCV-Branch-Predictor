@@ -34,7 +34,7 @@ reg [1:0] PHT [0:(1 << NUM_GHR_BITS)-1];
 
 wire [BTB_IDX_BITS-1:0] btb_index = pc_i[BTB_IDX_BITS+1:2];
 wire [31:0] btb_tag_in = pc_i;
-wire tag_match = (BTB_tag[btb_index] == btb_tag_in);
+wire tag_match = BTB_valid[btb_index] && (BTB_tag[btb_index] == btb_tag_in);
 wire btb_entry_valid = BTB_valid[btb_index];
 
 wire [NUM_GHR_BITS-1:0] pc_xor_ghr = pc_i[NUM_GHR_BITS+1:2] ^ GHR;
