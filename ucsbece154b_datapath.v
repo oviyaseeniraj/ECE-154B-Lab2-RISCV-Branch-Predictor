@@ -35,7 +35,7 @@ module ucsbece154b_datapath (
 
 wire [31:0] PCTargetE;
 reg [31:0] ResultW;
-reg BranchTakenD;
+reg BranchTakenD, is_branchE, is_jumpE;
 
 parameter NUM_BTB_ENTRIES = 16;
 parameter NUM_GHR_BITS = 4;
@@ -138,8 +138,8 @@ ucsbece154b_alu alu (
     .zero_o(ZeroE_o)
 );
 
-wire is_branchE = (op_o == instr_branch_op);
-wire is_jumpE = (op_o == instr_jal_op) || (op_o == instr_jalr_op);
+wire is_branchD = (op_o == instr_branch_op);
+wire is_jumpD = (op_o == instr_jal_op) || (op_o == instr_jalr_op);
 wire [$clog2(NUM_BTB_ENTRIES)-1:0] BTBwriteaddressE = PCD[$clog2(NUM_BTB_ENTRIES)+1:2];
 wire BTBweE = (is_jumpE || (is_branchE && PCSrcE_i));
 wire PHTweE = is_branchE;
@@ -158,6 +158,8 @@ always @ (posedge clk) begin
         Rs1E_o   <=  5'b0;
         Rs2E_o   <=  5'b0;
         RdE_o    <=  5'b0;
+        is_branchE <= 1'b0;
+        is_jumpE   <= 1'b0;
     end else begin 
         RD1E     <= RD1D;
         RD2E     <= RD2D;
@@ -167,6 +169,8 @@ always @ (posedge clk) begin
         Rs1E_o   <= Rs1D_o;
         Rs2E_o   <= Rs2D_o;
         RdE_o    <= RdD;
+        is_branchE <= is_branchD;
+        is_jumpE   <= is_jumpD;
     end 
 end
 
