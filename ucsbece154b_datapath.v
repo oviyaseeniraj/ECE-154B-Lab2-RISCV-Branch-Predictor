@@ -53,6 +53,7 @@ always @ (posedge clk) begin
 end
 
 reg [31:0] InstrD, PCPlus4D, PCD;
+reg BranchTakenD;
 wire [4:0] RdD;
 
 assign op_o       = InstrD[6:0];
@@ -89,10 +90,12 @@ always @ (posedge clk) begin
         InstrD   <= 32'b0;
         PCPlus4D <= 32'b0;
         PCD      <= 32'b0;
+        BranchTakenD <= 1'b0;
     end else if (!StallD_i) begin 
         InstrD   <= InstrF_i;
         PCPlus4D <= PCPlus4F;
         PCD      <= PCF_o;
+        BranchTakenD <= BranchTakenF;
     end 
 end
 

@@ -27,7 +27,7 @@ reg [31:0] branch_mispredict_count;
 wire is_branch = (top.riscv.dp.op_o == top.riscv.dp.instr_branch_op);
 wire is_jump = (top.riscv.dp.op_o == top.riscv.dp.instr_jal_op) || 
                (top.riscv.dp.op_o == top.riscv.dp.instr_jalr_op);
-wire predicted_taken = top.riscv.dp.BranchTakenF;
+wire predicted_taken = top.riscv.dp.BranchTakenD;
 wire actual_taken = top.riscv.c.PCSrcE_o;
 
 // Output file for data collection
