@@ -102,6 +102,17 @@ end
 
 // PHT update
 always @(posedge clk) begin
+    if (reset_i) begin
+        // Initialize all PHT entries to weakly taken (10)
+        PHT[0] <= 2'b10; PHT[1] <= 2'b10; PHT[2] <= 2'b10; PHT[3] <= 2'b10;
+        PHT[4] <= 2'b10; PHT[5] <= 2'b10; PHT[6] <= 2'b10; PHT[7] <= 2'b10;
+        PHT[8] <= 2'b10; PHT[9] <= 2'b10; PHT[10] <= 2'b10; PHT[11] <= 2'b10;
+        PHT[12] <= 2'b10; PHT[13] <= 2'b10; PHT[14] <= 2'b10; PHT[15] <= 2'b10;
+        PHT[16] <= 2'b10; PHT[17] <= 2'b10; PHT[18] <= 2'b10; PHT[19] <= 2'b10;
+        PHT[20] <= 2'b10; PHT[21] <= 2'b10; PHT[22] <= 2'b10; PHT[23] <= 2'b10;
+        PHT[24] <= 2'b10; PHT[25] <= 2'b10; PHT[26] <= 2'b10; PHT[27] <= 2'b10;
+        PHT[28] <= 2'b10; PHT[29] <= 2'b10; PHT[30] <= 2'b10; PHT[31] <= 2'b10;
+    end
     if (PHTwe_i) begin
         if (PHTincrement_i && PHT[PHTwriteaddress_i] < 2'b11)
             PHT[PHTwriteaddress_i] <= PHT[PHTwriteaddress_i] + 1;
