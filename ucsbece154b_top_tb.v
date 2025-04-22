@@ -32,9 +32,9 @@ reg [31:0] btb_miss_count;
 wire is_branch = (top.riscv.dp.op_o == 7'b1100011);
 wire is_jump = ((top.riscv.dp.op_o == 7'b1101111) ||  // JAL
                 (top.riscv.dp.op_o == 7'b1100111));   // JALR
-wire branch_resolved = is_branch && top.riscv.controller.PCSrcE;
+wire branch_resolved = is_branch && top.riscv.c.PCSrcE;
 wire branch_mispredict = is_branch && 
-                        (top.riscv.controller.PCSrcE != top.riscv.dp.BranchTakenF);
+                        (top.riscv.c.PCSrcE != top.riscv.dp.BranchTakenF);
 wire jump_mispredict = is_jump && !top.riscv.dp.BranchTakenF;
 wire btb_hit = top.riscv.dp.BranchTakenF && 
               (top.riscv.dp.BTBtargetF != (top.riscv.dp.PCF_o + 4));
@@ -80,7 +80,7 @@ initial begin
         cycle_count = cycle_count + 1;
         
         // Count instructions (retired in WB stage)
-        if (top.riscv.controller.RegWriteW && !reset && cycle_count > 2)
+        if (top.riscv.c.RegWriteW && !reset && cycle_count > 2)
             instr_count = instr_count + 1;
         
         // Count branches and mispredictions
@@ -182,7 +182,7 @@ always @(posedge clk) begin
             $display("BP Decision: PC=%h, Predicted=%b, Actual=%b, Target=%h", 
                     pc_e,
                     top.riscv.dp.BranchTakenF,
-                    top.riscv.controller.PCSrcE,
+                    top.riscv.c.PCSrcE,
                     top.riscv.dp.PCTargetE);
         end
         
