@@ -20,8 +20,8 @@
 // the GHR is updated with the outcome of the last branch instruction (e.g. 10010 + taken = 00101)
 
 module ucsbece154b_branch #(
-    parameter NUM_BTB_ENTRIES = 32,
-    parameter NUM_GHR_BITS    = 5
+    parameter NUM_BTB_ENTRIES = 64,
+    parameter NUM_GHR_BITS    = 6
 ) (
     input               clk, 
     input               reset_i,
