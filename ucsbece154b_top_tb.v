@@ -69,7 +69,7 @@ initial begin
         if (!reset && top.riscv.dp.InstrD !== 32'b0) begin
             instruction_count = instruction_count + 1;
 
-            case (top.riscv.dp.op_o)
+            case (top.riscv.dp.opE)
                 7'b1100011: begin // branch
                     branch_count = branch_count + 1;
                     if (BranchTakenE !== top.riscv.dp.ZeroE_o)
