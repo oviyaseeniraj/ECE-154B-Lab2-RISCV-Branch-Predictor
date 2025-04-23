@@ -74,13 +74,13 @@ initial begin
                 7'b1100011: begin // branch
                     branch_count = branch_count + 1;
 
-                    case (top.riscv.dp.funct3E)
-                        3'b000: mispredicted = (BranchTakenE !== top.riscv.dp.ZeroE_o);  // beq
-                        3'b001: mispredicted = (BranchTakenE !== ~top.riscv.dp.ZeroE_o); // bne
-                        default: mispredicted = 0;
-                    endcase
+                    // case (top.riscv.dp.funct3E)
+                    //     3'b000: mispredicted = (BranchTakenE !== top.riscv.dp.ZeroE_o);  // beq
+                    //     3'b001: mispredicted = (BranchTakenE !== ~top.riscv.dp.ZeroE_o); // bne
+                    //     default: mispredicted = 0;
+                    // endcase
 
-                    if (mispredicted)
+                    if (top.riscv.dp.Mispredict_o)
                         branch_miss_count = branch_miss_count + 1;
 
                     $display("[BRANCH] PC=%h TakenE=%b ZeroE=%b funct3=%b MISP=%b", 
