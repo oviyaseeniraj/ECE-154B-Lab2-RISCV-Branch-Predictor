@@ -10,7 +10,7 @@ module ucsbece154b_controller (
     input         [6:0]  op_i, 
     input         [2:0]  funct3_i,
     input                funct7b5_i,
-    input 	         ZeroE_i,
+    input 	             ZeroE_i,
     input         [4:0]  Rs1D_i,
     input         [4:0]  Rs2D_i,
     input         [4:0]  Rs1E_i,
@@ -18,7 +18,7 @@ module ucsbece154b_controller (
     input         [4:0]  RdE_i,
     input         [4:0]  RdM_i,
     input         [4:0]  RdW_i,
-    output wire		 StallF_o,  
+    output wire		     StallF_o,  
     output wire          StallD_o,
     output wire          FlushD_o,
     output wire    [2:0] ImmSrcD_o,
@@ -29,10 +29,10 @@ module ucsbece154b_controller (
     output reg     [1:0] ForwardAE_o,
     output reg     [1:0] ForwardBE_o,
     output reg           MemWriteM_o,
-    output reg          RegWriteW_o,
-    output reg    [1:0] ResultSrcW_o, 
-    output reg    [1:0] ResultSrcM_o,
-    input               Mispredict_i
+    output reg           RegWriteW_o,
+    output reg     [1:0] ResultSrcW_o, 
+    output reg     [1:0] ResultSrcM_o,
+    input                Mispredict_i
 );
 
 
@@ -205,14 +205,11 @@ module ucsbece154b_controller (
  end
 
 // Stall logic
- wire lwStall; 
+ wire lwStall = (ResultSrcE == 1) & ((Rs1D_i == RdE_i) | (Rs2D_i == RdE_i)) & (RdE_i != 0);
 
- assign lwStall = (ResultSrcE == 1) & ( (Rs1D_i == RdE_i) | (Rs2D_i == RdE_i) ) & (RdE_i != 0);
- assign StallF_o = lwStall;
- assign StallD_o = lwStall;
- assign FlushD_o = Mispredict_i;
- assign FlushE_o = lwStall | Mispredict_i; 
-  
-
+assign StallF_o = lwStall;
+assign StallD_o = lwStall;
+assign FlushD_o = Mispredict_i;
+assign FlushE_o = lwStall | Mispredict_i; 
 
 endmodule
