@@ -99,7 +99,7 @@ always @ (posedge clk) begin
             BTB_j_flag[i] <= 1'b0;
             BTB_b_flag[i] <= 1'b0;
             BTB_valid[i]  <= 1'b0;
-            PHT[i] <= 2'b01; // Initialize PHT to weakly taken
+            PHT[i] <= 2'b10; // Initialize PHT to weakly taken
         end
     end
 end
@@ -165,9 +165,7 @@ end
 
 wire [NUM_GHR_BITS-1:0] pc_xor_ghr = pc_i[NUM_GHR_BITS+1:2] ^ GHR;
 assign PHTreadaddress_o = pc_xor_ghr;
-
-wire [1:0] pht_entry = PHT[pc_xor_ghr];
-wire predict_taken = pht_entry[1];
+wire predict_taken = PHT[pc_xor_ghr][1];
 
 wire [31:0] btb_target_bypass = (BTB_we && (BTBwriteaddress_i == btb_index)) ? 
                                 BTBwritedata_i : BTB_target[btb_index];
