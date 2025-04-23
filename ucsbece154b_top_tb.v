@@ -1,77 +1,125 @@
-module ucsbece154b_top_tb();
+`define SIM
 
-// Clock generation (10ns period -> 100MHz)
+module ucsbece154b_top_tb ();
+
 reg clk = 1;
-always #5 clk = ~clk;
+always #1 clk <= ~clk;
 reg reset;
 
-// Instantiate DUT
-ucsbece154b_top top(
-    .clk(clk),
-    .reset(reset)
+ucsbece154b_top top (
+    .clk(clk), .reset(reset)
 );
 
-// Register file connections
-wire [31:0] s0 = top.riscv.dp.rf.s0;  // countx
-wire [31:0] s1 = top.riscv.dp.rf.s1;  // county
-wire [31:0] s2 = top.riscv.dp.rf.s2;  // countz
-wire [31:0] s3 = top.riscv.dp.rf.s3;  // innercount
-wire [31:0] t3 = top.riscv.dp.rf.t3;  // outer loop counter
+wire [31:0] reg_s0 = top.riscv.dp.rf.s0;
+wire [31:0] reg_s1 = top.riscv.dp.rf.s1;
+wire [31:0] reg_s2 = top.riscv.dp.rf.s2;
+wire [31:0] reg_s3 = top.riscv.dp.rf.s3;
+wire [31:0] reg_t0 = top.riscv.dp.rf.t0;
+wire [31:0] reg_t1 = top.riscv.dp.rf.t1;
+wire [31:0] reg_t2 = top.riscv.dp.rf.t2;
+wire [31:0] reg_t3 = top.riscv.dp.rf.t3;
+wire [31:0] reg_t4 = top.riscv.dp.rf.t4;
+wire [31:0] reg_t5 = top.riscv.dp.rf.t5;
+wire [31:0] reg_t6 = top.riscv.dp.rf.t6;
 
-// Instruction memory debug
-wire [31:0] current_pc = top.riscv.dp.PCF_o;
-wire [31:0] current_instr = top.riscv.dp.InstrF_i;
+integer cycle_count;
+integer instruction_count;
+integer branch_count, branch_miss_count;
+integer jump_count, jump_miss_count;
 
-// Performance monitoring
-reg [31:0] cycle_count;
+reg BranchTakenD, BranchTakenE;
+reg [31:0] BranchPCD, BranchPCE;
+
+always @(posedge clk) begin
+    if (reset) begin
+        BranchTakenD <= 0;
+        BranchTakenE <= 0;
+        BranchPCD <= 0;
+        BranchPCE <= 0;
+    end else begin
+        // Capture prediction in Decode stage
+        BranchTakenD <= top.riscv.dp.BranchTakenF;
+        BranchPCD <= top.riscv.dp.PCF_o;
+        
+        // Propagate to Execute stage
+        BranchTakenE <= BranchTakenD;
+        BranchPCE <= BranchPCD;
+    end
+end
 
 initial begin
-    $display("=== Starting Simulation ===");
-    $dumpfile("waveform.vcd");
-    $dumpvars(0, ucsbece154b_top_tb);
-    
-    // Initialize
-    cycle_count = 0;
-    
-    // Reset sequence
+    $display("Begin simulation.");
+
     reset = 1;
-    #20;  // 2 clock cycles
+    cycle_count = 0;
+    instruction_count = 0;
+    branch_count = 0;
+    branch_miss_count = 0;
+    jump_count = 0;
+    jump_miss_count = 0;
+
+    @(posedge clk);
+    @(posedge clk);
     reset = 0;
-    $display("Reset released at %0t ns", $time);
-    
-    // Main simulation loop
-    while (cycle_count < 1000) begin
+
+    forever begin
         @(posedge clk);
         cycle_count = cycle_count + 1;
-        
-        // Display PC and instruction
-        $display("Cycle %0d: PC = %h, Instr = %h", 
-                cycle_count, current_pc, current_instr);
-        
-        // Exit when we reach the END label (PC stops changing)
-        if (current_pc == 32'h0000003C) begin  // Update this to match your END label PC
-            $display("Reached END label at cycle %0d", cycle_count);
-            #20; // Let final writes complete
-            break;
+
+        if (!reset && top.riscv.dp.InstrD !== 32'b0) begin
+            instruction_count = instruction_count + 1;
+
+            case (top.riscv.dp.opE)
+                7'b1100011: begin // branch
+                    branch_count = branch_count + 1;
+                    if (BranchTakenE !== top.riscv.dp.ZeroE_o)
+                        branch_miss_count = branch_miss_count + 1;
+                    $display("[BRANCH] PC=%h TakenF=%b ZeroE=%b MISP=%b", 
+                        BranchPCE, BranchTakenE, top.riscv.dp.ZeroE_o,
+                        BranchTakenE !== top.riscv.dp.ZeroE_o);
+                end
+                7'b1101111, 7'b1100111: begin // jal / jalr
+                    jump_count = jump_count + 1;
+                    if (!BranchTakenE)
+                        jump_miss_count = jump_miss_count + 1;
+                    $display("[JUMP] PC=%h TakenF=%b MISP=%b", 
+                        BranchPCE, BranchTakenE, !BranchTakenE);
+                end
+
+            
+            endcase
         end
-        
-        // Safety timeout
-        if (cycle_count >= 999) begin
-            $display("Warning: Simulation timeout at cycle %0d", cycle_count);
-            break;
+
+        if (reg_t3 == 10) begin
+            $display("---- PROGRAM COMPLETE ----");
+            $display("Register values:");
+            $display("s0 (countx)      = %0d", reg_s0);
+            $display("s1 (county)      = %0d", reg_s1);
+            $display("s2 (countz)      = %0d", reg_s2);
+            $display("s3 (innercount)  = %0d", reg_s3);
+            $display("t0 = %0d", reg_t0);
+            $display("t1 = %0d", reg_t1);
+            $display("t2 = %0d", reg_t2);
+            $display("t3 = %0d", reg_t3);
+            $display("t4 = %0d", reg_t4);
+            $display("t5 = %0d", reg_t5);
+            $display("t6 = %0d", reg_t6);
+            $display("--------------------------");
+            $display("Performance:");
+            $display("Cycle count:            %0d", cycle_count);
+            $display("Instruction count:      %0d", instruction_count);
+            $display("CPI:                    %0f", 1.0 * cycle_count / instruction_count);
+            $display("Branch count:           %0d", branch_count);
+            $display("Branch mispredictions:  %0d", branch_miss_count);
+            $display("Branch misprediction rate: %0f%%", 
+                (branch_count > 0) ? 100.0 * branch_miss_count / branch_count : 0.0);
+            $display("Jump count:             %0d", jump_count);
+            $display("Jump mispredictions:    %0d", jump_miss_count);
+            $display("Jump misprediction rate:   %0f%%",
+                (jump_count > 0) ? 100.0 * jump_miss_count / jump_count : 0.0);
+            $stop;
         end
     end
-    
-    // Final checks
-    $display("\n=== Simulation Complete ===");
-    $display("Total cycles: %0d", cycle_count);
-    $display("Final values:");
-    $display("countx (s0): %0d", s0);
-    $display("county (s1): %0d", s1);
-    $display("countz (s2): %0d", s2);
-    $display("innercount (s3): %0d", s3);
-    
-    $finish;
 end
 
 endmodule

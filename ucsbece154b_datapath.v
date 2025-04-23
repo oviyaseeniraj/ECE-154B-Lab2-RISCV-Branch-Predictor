@@ -33,26 +33,56 @@ module ucsbece154b_datapath (
 
 `include "ucsbece154b_defines.vh"
 
-wire [31:0] PCTargetE;
+// FIXED: Moved earlier to avoid undefined reference
+reg [31:0] PCE;           // Program counter in EX stage
+reg [31:0] ExtImmE;       // Immediate in EX stage
+wire [31:0] PCTargetE = PCE + ExtImmE;  // FIXED: Define early
 reg [31:0] ResultW;
 
-parameter NUM_BTB_ENTRIES = 32;
-parameter NUM_GHR_BITS = 5;
-
+// NEW: Internal signals for branch predictor
 wire [31:0] BTBtargetF;
 wire BranchTakenF;
-wire [NUM_GHR_BITS-1:0] PHTreadaddressF;
+wire [4:0] PHTreadaddrF;     // output from branch predictor
+reg  [4:0] PHTwriteaddrD, PHTwriteaddrE;    // NEW: FIXED — now legal to assign bc reg not wire
+reg PHTweE, PHTincE;
+reg GHRresetE;
+reg BTBweE;
+reg BranchTakenD, BranchTakenE;
+reg [4:0] BTBwriteaddrE;
+reg [31:0] BTBwritedataE;
+
+// NEW: Branch predictor instantiation
+ucsbece154b_branch #(32, 5) branch_predictor (
+    .clk(clk),
+    .reset_i(reset),
+    .pc_i(PCF_o),
+    .BTBwriteaddress_i(BTBwriteaddrE),
+    .BTBwritedata_i(BTBwritedataE),
+    .BTBtarget_o(BTBtargetF),
+    .BTB_we(BTBweE),
+    .BranchTaken_o(BranchTakenF),
+    .op_i(op_o),
+    .PHTincrement_i(PHTincE),
+    .GHRreset_i(GHRresetE),
+    .PHTwe_i(PHTweE),
+    .PHTwriteaddress_i(PHTwriteaddrE),
+    .PHTreadaddress_o(PHTreadaddrF)
+);
+
+// ***** FETCH STAGE *********************************
 wire [31:0] PCPlus4F = PCF_o + 32'd4;
-
-
-wire [31:0] PCnewF = PCSrcE_i ? PCTargetE : 
-                   (BranchTakenF ? BTBtargetF : PCPlus4F);
+wire [31:0] PCtargetF = BranchTakenF ? BTBtargetF : PCPlus4F;
+// wire [31:0] PCnewF = PCSrcE_i ? PCTargetE : PCtargetF;
+wire [31:0] PCnewF = PCSrcE_i ? PCTargetE :      // Misprediction correction
+                    BranchTakenF ? BTBtargetF :  // Predicted taken
+                    PCPlus4F;                   // Default next PC
 
 always @ (posedge clk) begin
     if (reset)        PCF_o <= pc_start;
     else if (!StallF_i) PCF_o <= PCnewF;
 end
 
+// ***** DECODE STAGE ********************************
 reg [31:0] InstrD, PCPlus4D, PCD;
 wire [4:0] RdD;
 
@@ -81,7 +111,7 @@ always @ * begin
       imm_Btype: ExtImmD = {{20{InstrD[31]}},InstrD[7],InstrD[30:25], InstrD[11:8],1'b0};
       imm_Jtype: ExtImmD = {{12{InstrD[31]}},InstrD[19:12],InstrD[20],InstrD[30:21],1'b0};
       imm_Utype: ExtImmD = {InstrD[31:12],12'b0};
-      default:   ExtImmD = 32'bx;
+      default:   ExtImmD = 32'bx; 
    endcase
 end
 
@@ -90,14 +120,21 @@ always @ (posedge clk) begin
         InstrD   <= 32'b0;
         PCPlus4D <= 32'b0;
         PCD      <= 32'b0;
+        PHTwriteaddrD <= 5'b0;
+        BranchTakenD <= 1'b0;
     end else if (!StallD_i) begin 
         InstrD   <= InstrF_i;
         PCPlus4D <= PCPlus4F;
         PCD      <= PCF_o;
+        PHTwriteaddrD <= PHTreadaddrF;
+        BranchTakenD <= BranchTakenF;
     end 
 end
 
-reg [31:0] RD1E, RD2E, PCPlus4E, ExtImmE, PCE; 
+// ***** EXECUTE STAGE ******************************
+reg [31:0] RD1E, RD2E, PCPlus4E;
+reg [6:0] opE;
+
 reg [31:0] ForwardDataM;
 
 reg  [31:0] SrcAE;
@@ -137,15 +174,18 @@ ucsbece154b_alu alu (
     .zero_o(ZeroE_o)
 );
 
-wire is_branchE = (op_o == instr_branch_op);
-wire is_jumpE = (op_o == instr_jal_op) || (op_o == instr_jalr_op);
-wire [$clog2(NUM_BTB_ENTRIES)-1:0] BTBwriteaddressE = PCD[2+:$clog2(NUM_BTB_ENTRIES)];
-wire BTBweE = (is_jumpE || (is_branchE && PCSrcE_i));
-wire PHTweE = is_branchE;
-wire PHTincrementE = PCSrcE_i;
-wire GHRresetE = PCSrcE_i;
+// Branch predictor control logic (NEW)
+always @(*) begin
+    BTBwriteaddrE  = PCE[6:2];
+    BTBwritedataE  = PCTargetE;
+    BTBweE         = ((opE == instr_branch_op && PCSrcE_i) || opE == instr_jal_op || opE == instr_jalr_op);
+    PHTweE         = (opE == instr_branch_op);
+    PHTincE        = (opE == instr_branch_op && PCSrcE_i);
+    GHRresetE      = (opE == instr_branch_op) && (BranchTakenE != PCSrcE_i);
 
-assign PCTargetE = PCE + ExtImmE;
+    $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
+        BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);
+end
 
 always @ (posedge clk) begin
     if (reset | FlushE_i) begin
@@ -157,6 +197,9 @@ always @ (posedge clk) begin
         Rs1E_o   <=  5'b0;
         Rs2E_o   <=  5'b0;
         RdE_o    <=  5'b0;
+        PHTwriteaddrE <= 5'b0;
+        opE <= 7'b0;
+        BranchTakenE <= 1'b0;
     end else begin 
         RD1E     <= RD1D;
         RD2E     <= RD2D;
@@ -166,29 +209,13 @@ always @ (posedge clk) begin
         Rs1E_o   <= Rs1D_o;
         Rs2E_o   <= Rs2D_o;
         RdE_o    <= RdD;
+        PHTwriteaddrE <= PHTwriteaddrD;
+        opE <= op_o;
+        BranchTakenE <= BranchTakenD;
     end 
 end
 
-ucsbece154b_branch #(
-    .NUM_BTB_ENTRIES(NUM_BTB_ENTRIES),
-    .NUM_GHR_BITS(NUM_GHR_BITS)
-) branch_predictor (
-    .clk(clk),
-    .reset_i(reset),
-    .pc_i(PCF_o),
-    .BTBwriteaddress_i(BTBwriteaddressE),
-    .BTBwritedata_i(ALUResultE),
-    .BTBtarget_o(BTBtargetF),
-    .BTB_we(BTBweE),
-    .BranchTaken_o(BranchTakenF),
-    .op_i(op_o),
-    .PHTincrement_i(PHTincrementE),
-    .GHRreset_i(GHRresetE),
-    .PHTwe_i(PHTweE),
-    .PHTwriteaddress_i(PHTreadaddressF),
-    .PHTreadaddress_o(PHTreadaddressF)
-);
-
+// ***** MEMORY STAGE ***************************
 reg [31:0] ExtImmM, PCPlus4M;
 
 always @ * begin
@@ -216,6 +243,7 @@ always @ (posedge clk) begin
     end 
 end
 
+// ***** WRITEBACK STAGE ************************
 reg [31:0] PCPlus4W, ALUResultW, ReadDataW, ExtImmW;
 
 always @ * begin
@@ -225,8 +253,8 @@ always @ * begin
      MuxResult_PCPlus4:  ResultW = PCPlus4W;
      MuxResult_imm:  ResultW = ExtImmW;
      default:        ResultW = 32'bx;
-   endcase
- end
+ endcase
+end
 
 always @ (posedge clk) begin
     if (reset) begin
