@@ -57,9 +57,9 @@ module ucsbece154b_controller (
         ALUSrcD,
         MemWriteD,
         ResultSrcD,
-	BranchD, 
-	ALUOpD,
-	JumpD} = maindecoderD;
+         BranchD, 
+         ALUOpD,
+         JumpD} = maindecoderD;
 
  always @ * begin
    case (op_i)
