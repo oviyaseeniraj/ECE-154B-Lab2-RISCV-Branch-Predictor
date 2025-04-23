@@ -122,7 +122,7 @@ always @(posedge clk) begin
     // $display("[BTB EXEC TAG FROM TABLE] tag=%h", BTB_tag[BTBwriteaddress_i]);
     // $display("[BTB EXEC VALID] valid=%b", BTB_valid[BTBwriteaddress_i]);
 
-    if (BTB_we && !tag_match_e) begin
+    if (BTB_we && (!tag_match_e || !BTB_valid[BTBwriteaddress_i])) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
         BTB_tag[BTBwriteaddress_i]    <= tag_e;
         BTB_j_flag[BTBwriteaddress_i] <= (op_e == instr_jal_op || op_e == instr_jalr_op);
@@ -195,7 +195,7 @@ end
 always @(posedge clk) begin
     if (reset_i || GHRreset_i) begin
         GHR <= {NUM_GHR_BITS{1'b0}};
-    end else if (PHTincrement_i) begin
+    end else begin
         GHR <= {GHR[NUM_GHR_BITS-2:0], BranchTaken_o};  // Shift in latest result
         //GHR <= {GHR[NUM_GHR_BITS-2:0], PHTincrement_i};
     end
