@@ -143,7 +143,7 @@ always @(posedge clk) begin
 end
 
 
-wire [NUM_GHR_BITS-1:0] pc_xor_ghr = pc_i[NUM_GHR_BITS+1:2] ^ GHR;
+wire [NUM_GHR_BITS-1:0] pc_xor_ghr = tag_e[NUM_GHR_BITS+1:2] ^ GHR;
 assign PHTreadaddress_o = pc_xor_ghr;
 
 wire [1:0] pht_entry = PHT[pc_xor_ghr];
@@ -168,7 +168,7 @@ always @(*) begin
         end else if (BTB_b_flag[btb_index]) begin
             // Branch depends on PHT prediction
             BTBtarget_o = BTB_target[btb_index];
-            BranchTaken_o = (PHT[tag_e[NUM_GHR_BITS+1:2] ^ GHR][1] == 1'b1);  // MSB of counter
+            BranchTaken_o = (PHT[pc_xor_ghr][1] == 1'b1);  // MSB of counter
             $display("[BRANCHTAKEN] addr=%0d PHTval=%b BranchTaken_o=%b", 
                  tag_e[NUM_GHR_BITS+1:2] ^ GHR, PHT[tag_e[NUM_GHR_BITS+1:2] ^ GHR][1], BranchTaken_o);
         end
