@@ -58,12 +58,12 @@ initial begin
     jump_count = 0;
     jump_miss_count = 0;
 
-    @(negedge clk);
-    @(negedge clk);
+    @(posedge clk);
+    @(posedge clk);
     reset = 0;
 
     forever begin
-        @(negedge clk);
+        @(posedge clk);
         cycle_count = cycle_count + 1;
 
         if (!reset && top.riscv.dp.InstrD !== 32'b0) begin
