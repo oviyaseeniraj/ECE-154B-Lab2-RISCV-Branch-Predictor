@@ -198,7 +198,7 @@ always @(*) begin
                ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq taken
                 (funct3E == instr_bne_funct3 && !ZeroE_o))); // bne taken
     
-    Mispredict_o = GHRresetE;
+    Mispredict_o = GHRresetE || ((opE == instr_jal_op || opE == instr_jalr_op) && !BranchTakenE);
 
     $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
         BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);
