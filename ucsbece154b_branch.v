@@ -99,7 +99,7 @@ always @ (posedge clk) begin
             BTB_j_flag[i] <= 1'b0;
             BTB_b_flag[i] <= 1'b0;
             BTB_valid[i]  <= 1'b0;
-            PHT[i] <= 2'b00; // Initialize PHT to weakly taken
+            PHT[i] <= 2'b01; // Initialize PHT to weakly taken
         end
     end
 end
