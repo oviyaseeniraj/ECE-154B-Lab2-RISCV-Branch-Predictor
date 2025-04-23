@@ -182,14 +182,13 @@ always @(*) begin
     BTBwriteaddrE  = PCE[6:2];
     BTBwritedataE  = PCTargetE;
 
-    branch_taken = (opE == instr_beq_op && ZeroE_o) ||  // beq taken
-                   (opE == instr_bne_op && !ZeroE_o)
-    jump_taken = (opE == instr_jal_op) || (opE == instr_jalr_op);
     is_branch = (opE == instr_branch_op);
     is_jump = (opE == instr_jal_op) || (opE == instr_jalr_op);
+    branch_taken = is_branch && ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq taken
+                   (funct3E == instr_bne_funct3 && !ZeroE_o))
 
     // Update BTB on taken branches (including bne)
-    BTBweE = branch_taken || jump_taken;
+    BTBweE = branch_taken || is_jump;
     
     // Update PHT on all branches
     PHTweE = is_branch;
@@ -200,7 +199,7 @@ always @(*) begin
     // Reset GHR on misprediction
     GHRresetE = is_branch && (BranchTakenE != branch_taken);
     
-    Mispredict_o = GHRresetE || (is_jump  && !BranchTakenE);
+    Mispredict_o = GHRresetE || (is_jump && !BranchTakenE);
 
     $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
         BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);
