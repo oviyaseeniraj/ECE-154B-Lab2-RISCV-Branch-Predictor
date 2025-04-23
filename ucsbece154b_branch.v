@@ -43,42 +43,12 @@ reg tag_match_d = 1'b0;
 reg tag_match_e = 1'b0;
 
 initial begin
-    BTB_target[0] = 32'b0;
-    BTB_tag[0]    = 32'b0;
-    BTB_j_flag[0] = 1'b0;
-    BTB_b_flag[0] = 1'b0;
-    BTB_valid[0]  = 1'b0;
-
-    BTB_target[1] = 32'b0;
-    BTB_tag[1]    = 32'b0;
-    BTB_j_flag[1] = 1'b0;
-    BTB_b_flag[1] = 1'b0;
-    BTB_valid[1]  = 1'b0;
-
-    BTB_target[2] = 32'b0;
-    BTB_tag[2]    = 32'b0;
-    BTB_j_flag[2] = 1'b0;
-    BTB_b_flag[2] = 1'b0;
-    BTB_valid[2]  = 1'b0;
-
-    BTB_target[3] = 32'b0;
-    BTB_tag[3]    = 32'b0;
-    BTB_j_flag[3] = 1'b0;
-    BTB_b_flag[3] = 1'b0;
-    BTB_valid[3]  = 1'b0;
-
-    BTB_target[4] = 32'b0;
-    BTB_tag[4]    = 32'b0;
-    BTB_j_flag[4] = 1'b0;
-    BTB_b_flag[4] = 1'b0;
-    BTB_valid[4]  = 1'b0;
-
-    BTB_target[5] = 32'b0;
-    BTB_tag[5]    = 32'b0;
-    BTB_j_flag[5] = 1'b0;
-    BTB_b_flag[5] = 1'b0;
-    BTB_valid[5]  = 1'b0;
-
+    BTB_target[0] = 32'b0; BTB_tag[0]    = 32'b0; BTB_j_flag[0] = 1'b0; BTB_b_flag[0] = 1'b0; BTB_valid[0]  = 1'b0;
+    BTB_target[1] = 32'b0; BTB_tag[1]    = 32'b0; BTB_j_flag[1] = 1'b0; BTB_b_flag[1] = 1'b0; BTB_valid[1]  = 1'b0;
+    BTB_target[2] = 32'b0; BTB_tag[2]    = 32'b0; BTB_j_flag[2] = 1'b0; BTB_b_flag[2] = 1'b0; BTB_valid[2]  = 1'b0;
+    BTB_target[3] = 32'b0; BTB_tag[3]    = 32'b0; BTB_j_flag[3] = 1'b0; BTB_b_flag[3] = 1'b0; BTB_valid[3]  = 1'b0;
+    BTB_target[4] = 32'b0; BTB_tag[4]    = 32'b0; BTB_j_flag[4] = 1'b0; BTB_b_flag[4] = 1'b0; BTB_valid[4]  = 1'b0;
+    BTB_target[5] = 32'b0; BTB_tag[5]    = 32'b0; BTB_j_flag[5] = 1'b0; BTB_b_flag[5] = 1'b0; BTB_valid[5]  = 1'b0;
     BTB_target[6] = 32'b0; BTB_tag[6] = 32'b0; BTB_j_flag[6] = 1'b0; BTB_b_flag[6] = 1'b0; BTB_valid[6] = 1'b0;
     BTB_target[7] = 32'b0; BTB_tag[7] = 32'b0; BTB_j_flag[7] = 1'b0; BTB_b_flag[7] = 1'b0; BTB_valid[7] = 1'b0;
     BTB_target[8] = 32'b0; BTB_tag[8] = 32'b0; BTB_j_flag[8] = 1'b0; BTB_b_flag[8] = 1'b0; BTB_valid[8] = 1'b0;
@@ -105,7 +75,17 @@ initial begin
     BTB_target[29] = 32'b0; BTB_tag[29] = 32'b0; BTB_j_flag[29] = 1'b0; BTB_b_flag[29] = 1'b0; BTB_valid[29] = 1'b0;
     BTB_target[30] = 32'b0; BTB_tag[30] = 32'b0; BTB_j_flag[30] = 1'b0; BTB_b_flag[30] = 1'b0; BTB_valid[30] = 1'b0;
     BTB_target[31] = 32'b0; BTB_tag[31] = 32'b0; BTB_j_flag[31] = 1'b0; BTB_b_flag[31] = 1'b0; BTB_valid[31] = 1'b0;
-    
+
+    // initialize PHT to weakly taken
+    PHT[0] = 2'b01; PHT[1] = 2'b01; PHT[2] = 2'b01; PHT[3] = 2'b01;
+    PHT[4] = 2'b01; PHT[5] = 2'b01; PHT[6] = 2'b01; PHT[7] = 2'b01;
+    PHT[8] = 2'b01; PHT[9] = 2'b01; PHT[10] = 2'b01; PHT[11] = 2'b01;
+    PHT[12] = 2'b01; PHT[13] = 2'b01; PHT[14] = 2'b01; PHT[15] = 2'b01;
+    PHT[16] = 2'b01; PHT[17] = 2'b01; PHT[18] = 2'b01; PHT[19] = 2'b01;
+    PHT[20] = 2'b01; PHT[21] = 2'b01; PHT[22] = 2'b01; PHT[23] = 2'b01;
+    PHT[24] = 2'b01; PHT[25] = 2'b01; PHT[26] = 2'b01; PHT[27] = 2'b01;
+    PHT[28] = 2'b01; PHT[29] = 2'b01; PHT[30] = 2'b01; PHT[31] = 2'b01;
+
 end
 
 always @(posedge clk) begin
