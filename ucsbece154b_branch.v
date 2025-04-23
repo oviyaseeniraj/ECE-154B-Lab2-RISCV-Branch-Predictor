@@ -41,7 +41,6 @@ reg btb_entry_valid = 1'b0;
 reg [31:0] tag_d, tag_e;
 reg tag_match_d = 1'b0;
 reg tag_match_e = 1'b0;
-reg [6:0] op_d = 7'b0;
 reg [6:0] op_e = 7'b0;
 
 initial begin
@@ -93,7 +92,6 @@ end
 always @(posedge clk) begin
     tag_d <= btb_tag_in;
     tag_e <= tag_d;
-    op_d <= op_i;
 end
 
 always @(posedge clk) begin
