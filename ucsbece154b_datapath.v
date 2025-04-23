@@ -51,7 +51,7 @@ reg BTBweE;
 reg BranchTakenD, BranchTakenE;
 reg [4:0] BTBwriteaddrE;
 reg [31:0] BTBwritedataE;
-assign mispredict_o = GHRresetE;
+assign mispredict_o = BranchTakenE != PCSrcE_i;
 
 // NEW: Branch predictor instantiation
 ucsbece154b_branch #(32, 5) branch_predictor (
