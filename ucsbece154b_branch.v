@@ -90,9 +90,10 @@ reg [31:0] btb_write_pc = 32'b0;
 
 // end
 
+integer i;
 always @ (posedge clk) begin
     if (reset_i) begin
-        for (integer i = 0; i < NUM_BTB_ENTRIES; i = i + 1) begin
+        for (i = 0; i < NUM_BTB_ENTRIES; i = i + 1) begin
             BTB_target[i] <= 32'b0;
             BTB_tag[i]    <= 32'b0;
             BTB_j_flag[i] <= 1'b0;
