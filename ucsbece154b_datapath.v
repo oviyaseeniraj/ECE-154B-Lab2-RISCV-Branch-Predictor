@@ -28,7 +28,8 @@ module ucsbece154b_datapath (
     input         [31:0] ReadDataM_i,
     input          [1:0] ResultSrcW_i,
     output reg     [4:0] RdW_o,
-    input          [1:0] ResultSrcM_i
+    input          [1:0] ResultSrcM_i,
+    output wire          mispredict_o
 );
 
 `include "ucsbece154b_defines.vh"
@@ -50,6 +51,7 @@ reg BTBweE;
 reg BranchTakenD, BranchTakenE;
 reg [4:0] BTBwriteaddrE;
 reg [31:0] BTBwritedataE;
+assign mispredict_o = GHRresetE;
 
 // NEW: Branch predictor instantiation
 ucsbece154b_branch #(32, 5) branch_predictor (

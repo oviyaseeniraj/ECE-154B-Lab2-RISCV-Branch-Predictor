@@ -18,6 +18,7 @@ module ucsbece154b_controller (
     input         [4:0]  RdE_i,
     input         [4:0]  RdM_i,
     input         [4:0]  RdW_i,
+    input                mispredict_i,
     output wire		 StallF_o,  
     output wire          StallD_o,
     output wire          FlushD_o,
@@ -209,8 +210,8 @@ module ucsbece154b_controller (
  assign lwStall = (ResultSrcE == 1) & ( (Rs1D_i == RdE_i) | (Rs2D_i == RdE_i) ) & (RdE_i != 0);
  assign StallF_o = lwStall;
  assign StallD_o = lwStall;
- assign FlushD_o = PCSrcE_o;
- assign FlushE_o = lwStall | PCSrcE_o; 
+ assign FlushD_o = mispredict_i;
+ assign FlushE_o = lwStall | mispredict_i; 
   
 
 
