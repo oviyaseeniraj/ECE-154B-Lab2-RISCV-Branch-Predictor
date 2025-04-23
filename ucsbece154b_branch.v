@@ -215,8 +215,9 @@ end
 always @(posedge clk) begin
     if (reset_i || GHRreset_i) begin
         GHR <= {NUM_GHR_BITS{1'b0}};
-    end else begin
-        GHR <= {GHR[NUM_GHR_BITS-2:0], BranchTaken_o};  // Shift in latest result
+    end else if (PHTwe_i) begin
+        //GHR <= {GHR[NUM_GHR_BITS-2:0], BranchTaken_o};  // Shift in latest result
+        GHR <= {BranchTaken_o, GHR[NUM_GHR_BITS-1:1]};
         //GHR <= {GHR[NUM_GHR_BITS-2:0], PHTincrement_i};
     end
 end
