@@ -39,7 +39,8 @@ reg tag_match = 1'b0;
 reg btb_entry_valid = 1'b0;
 
 reg [31:0] tag_d, tag_e;
-reg tag_match_d, tag_match_e;
+reg tag_match_d = 1'b0;
+reg tag_match_e = 1'b0;
 
 initial begin
     BTB_target[0] = 32'b0;
