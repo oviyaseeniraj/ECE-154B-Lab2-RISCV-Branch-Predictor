@@ -108,6 +108,7 @@ always @(*) begin
     end
 end
 
+
 always @(posedge clk) begin
     // $display("[BTB INDEX] index=%0d", btb_index);
     // $display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
@@ -153,15 +154,34 @@ assign btb_b = BTB_b_flag[btb_index];
 assign btb_j = BTB_j_flag[btb_index];
 assign btb_valid = BTB_valid[btb_index];
 
+// always @(*) begin
+//     if (tag_match && BTB_valid[btb_index]) begin
+//         BTBtarget_o = btb_target_bypass;
+//         BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || BTB_j_flag[btb_index];
+//     end else begin
+//         BTBtarget_o = 32'b0;
+//         BranchTaken_o = 1'b0;
+//     end
+// end
+
 always @(*) begin
-    if (tag_match && BTB_valid[btb_index]) begin
-        BTBtarget_o = btb_target_bypass;
-        BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || BTB_j_flag[btb_index];
-    end else begin
-        BTBtarget_o = 32'b0;
-        BranchTaken_o = 1'b0;
+    BTBtarget_o = 32'b0;
+    BranchTaken_o = 1'b0;
+
+    if (BTB_valid[btb_index] && tag_match) begin
+        if (BTB_j_flag[btb_index]) begin
+            // Jumps are always taken
+            BTBtarget_o = BTB_target[btb_index];
+            BranchTaken_o = 1'b1;
+        end else if (BTB_b_flag[btb_index]) begin
+            // Branch depends on PHT prediction
+            BTBtarget_o = BTB_target[btb_index];
+            BranchTaken_o = (PHT[GHR][1] == 1'b1);  // MSB of counter
+        end
     end
 end
+
+
 always @(posedge clk) begin
     if (PHTwe_i) begin
         if (PHTincrement_i && PHT[PHTwriteaddress_i] < 2'b11)
@@ -175,11 +195,10 @@ always @(posedge clk) begin
 end
 
 always @(posedge clk) begin
-    if (reset_i || GHRreset_i)
-        GHR <= 0;
-    else if (op_e == instr_branch_op) begin
-        GHR <= {GHR[NUM_GHR_BITS-2:0], ~PHTincrement_i};
-        $display("[GHR UPDATE] new GHR=%b", {GHR[NUM_GHR_BITS-2:0], ~PHTincrement_i});
+    if (reset_i || GHRreset_i) begin
+        GHR <= {NUM_GHR_BITS{1'b0}};
+    end else if (PHTincrement_i) begin
+        GHR <= {GHR[NUM_GHR_BITS-2:0], BranchTaken_o};  // Shift in latest result
     end
 end
 
