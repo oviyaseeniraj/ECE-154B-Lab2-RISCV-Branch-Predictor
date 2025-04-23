@@ -110,17 +110,17 @@ end
 
 
 always @(posedge clk) begin
-    // $display("[BTB INDEX] index=%0d", btb_index);
-    // $display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
-    // $display("[BTB TAG FROM TABLE] tag=%h", BTB_tag[btb_index]);
-    // $display("[BTB VALID] valid=%b", BTB_valid[btb_index]);
+    $display("[BTB INDEX] index=%0d", btb_index);
+    $display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
+    $display("[BTB TAG FROM TABLE] tag=%h", BTB_tag[btb_index]);
+    $display("[BTB VALID] valid=%b", BTB_valid[btb_index]);
     
     $display("[BTB TAG E MATCH] match_e=%b", tag_match_e);
     $display("[BTB TAG DECODE MATCH] match=%b", tag_match);
-    $display("[BTB INDEX EXECUTE] index=%0d", BTBwriteaddress_i);
-    $display("[BTB TAG EXEC PC] tag=%h", tag_e);
-    $display("[BTB EXEC TAG FROM TABLE] tag=%h", BTB_tag[BTBwriteaddress_i]);
-    $display("[BTB EXEC VALID] valid=%b", BTB_valid[BTBwriteaddress_i]);
+    // $display("[BTB INDEX EXECUTE] index=%0d", BTBwriteaddress_i);
+    // $display("[BTB TAG EXEC PC] tag=%h", tag_e);
+    // $display("[BTB EXEC TAG FROM TABLE] tag=%h", BTB_tag[BTBwriteaddress_i]);
+    // $display("[BTB EXEC VALID] valid=%b", BTB_valid[BTBwriteaddress_i]);
 
     if (BTB_we && !tag_match_e) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
@@ -133,11 +133,13 @@ always @(posedge clk) begin
                  BTBwriteaddress_i, tag_e, BTBwritedata_i, op_e, 
                  (op_e == instr_jal_op || op_e == instr_jalr_op), 
                  (op_e == instr_branch_op));
-    end
-    
-    $display("[BTB ENTRY] index=%0d tag=%h target=%h j=%b b=%b valid=%b",
+        
+        $display("[BTB ENTRY] index=%0d tag=%h target=%h j=%b b=%b valid=%b",
                 BTBwriteaddress_i, BTB_tag[BTBwriteaddress_i], BTB_target[BTBwriteaddress_i], 
                 BTB_j_flag[BTBwriteaddress_i], BTB_b_flag[BTBwriteaddress_i], BTB_valid[BTBwriteaddress_i]);
+
+    end
+    
 end
 
 
@@ -152,17 +154,7 @@ wire [31:0] btb_target_bypass = (BTB_we && (BTBwriteaddress_i == btb_index)) ?
 
 assign btb_b = BTB_b_flag[btb_index];
 assign btb_j = BTB_j_flag[btb_index];
-assign btb_valid = BTB_valid[btb_index];
-
-// always @(*) begin
-//     if (tag_match && BTB_valid[btb_index]) begin
-//         BTBtarget_o = btb_target_bypass;
-//         BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || BTB_j_flag[btb_index];
-//     end else begin
-//         BTBtarget_o = 32'b0;
-//         BranchTaken_o = 1'b0;
-//     end
-// end
+assign btb_valid = BTB_valid[btb_index];x
 
 always @(*) begin
     BTBtarget_o = 32'b0;
