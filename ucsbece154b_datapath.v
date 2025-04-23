@@ -43,7 +43,7 @@ reg [31:0] ResultW;
 wire [31:0] BTBtargetF;
 wire BranchTakenF;
 wire [4:0] PHTreadaddrF;     // output from branch predictor
-reg  [4:0] PHTwriteaddrE;    // NEW: FIXED — now legal to assign bc reg not wire
+reg  [4:0] PHTwriteaddrD, PHTwriteaddrE;    // NEW: FIXED — now legal to assign bc reg not wire
 reg PHTweE, PHTincE;
 reg GHRresetE;
 reg BTBweE;
@@ -116,10 +116,12 @@ always @ (posedge clk) begin
         InstrD   <= 32'b0;
         PCPlus4D <= 32'b0;
         PCD      <= 32'b0;
+        PHTwriteaddrD <= 5'b0;
     end else if (!StallD_i) begin 
         InstrD   <= InstrF_i;
         PCPlus4D <= PCPlus4F;
         PCD      <= PCF_o;
+        PHTwriteaddrD <= PHTreadaddrF;
     end 
 end
 
@@ -170,7 +172,6 @@ always @(*) begin
     BTBwriteaddrE  = PCE[6:2];
     BTBwritedataE  = PCTargetE;
     BTBweE         = ((op_o == instr_branch_op && ZeroE_o == 1'b0) || op_o == instr_jal_op || op_o == instr_jalr_op);
-    PHTwriteaddrE  = PHTreadaddrF;
     PHTweE         = (op_o == instr_branch_op);
     PHTincE        = (op_o == instr_branch_op && ZeroE_o == 1'b0);
     GHRresetE      = (op_o == instr_branch_op) && (BranchTakenF != ~ZeroE_o);
@@ -189,6 +190,7 @@ always @ (posedge clk) begin
         Rs1E_o   <=  5'b0;
         Rs2E_o   <=  5'b0;
         RdE_o    <=  5'b0;
+        PHTwriteaddrE <= 5'b0;
     end else begin 
         RD1E     <= RD1D;
         RD2E     <= RD2D;
@@ -198,6 +200,7 @@ always @ (posedge clk) begin
         Rs1E_o   <= Rs1D_o;
         Rs2E_o   <= Rs2D_o;
         RdE_o    <= RdD;
+        PHTwriteaddrE <= PHTwriteaddrD;
     end 
 end
 
