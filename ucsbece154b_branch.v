@@ -99,7 +99,7 @@ always @ (posedge clk) begin
             BTB_j_flag[i] <= 1'b0;
             BTB_b_flag[i] <= 1'b0;
             BTB_valid[i]  <= 1'b0;
-            PHT[i] <= 2'b01; // Initialize PHT to weakly taken
+            PHT[i] <= 2'b00; // Initialize PHT to weakly taken
         end
     end
 end
@@ -188,7 +188,7 @@ always @(*) begin
         end else if (BTB_b_flag[btb_index]) begin
             // Branch depends on PHT prediction
             BTBtarget_o = BTB_target[btb_index];
-            BranchTaken_o = PHT[pc_xor_ghr][1];  // MSB of counter
+            BranchTaken_o = predict_taken;  // MSB of counter
             $display("[BRANCHTAKEN] addr=%0d PHTval=%b BranchTaken_o=%b", 
                  pc_xor_ghr, PHT[pc_xor_ghr][1], BranchTaken_o);
         end
