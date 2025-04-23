@@ -110,17 +110,17 @@ always @(posedge clk) begin
     $display("[BTB TAG MATCH] match=%b", tag_match);
     $display("[BTB TAG E MATCH] match_e=%b", tag_match_e);
 
-    if (BTB_we && !tag_match_e) begin
+    if (BTB_we) begin  // Remove tag_match_e condition
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
-        BTB_tag[BTBwriteaddress_i]    <= tag_e;
-        BTB_j_flag[BTBwriteaddress_i] <= (op_e == instr_jal_op || op_e == instr_jalr_op);
-        BTB_b_flag[BTBwriteaddress_i] <= (op_e == instr_branch_op);
+        BTB_tag[BTBwriteaddress_i]    <= pc_i;  // Use current PC, not delayed
+        BTB_j_flag[BTBwriteaddress_i] <= (op_i == instr_jal_op || op_i == instr_jalr_op);
+        BTB_b_flag[BTBwriteaddress_i] <= (op_i == instr_branch_op);
         BTB_valid[BTBwriteaddress_i]  <= 1'b1;
-
-        $display("[BTB WRITE] index=%0d PC=%h target=%h op=%b j=%b b=%b", 
-                 BTBwriteaddress_i, tag_e, BTBwritedata_i, op_e, 
-                 (op_e == instr_jal_op || op_e == instr_jalr_op), 
-                 (op_e == instr_branch_op));
+        
+        $display("[BTB WRITE] idx=%d PC=%h target=%h j=%b b=%b",
+                BTBwriteaddress_i, pc_i, BTBwritedata_i,
+                (op_i == instr_jal_op || op_i == instr_jalr_op),
+                (op_i == instr_branch_op));
         
         $display("[BTB ENTRY] index=%0d tag=%h target=%h j=%b b=%b valid=%b",
                  BTBwriteaddress_i, BTB_tag[BTBwriteaddress_i], BTB_target[BTBwriteaddress_i], 
@@ -142,15 +142,21 @@ assign btb_b = BTB_b_flag[btb_index];
 assign btb_j = BTB_j_flag[btb_index];
 assign btb_valid = BTB_valid[btb_index];
 
+// Immediate tag matching (no delays)
+wire tag_match = BTB_valid[btb_index] && (pc_i == BTB_tag[btb_index]);
+
 always @(*) begin
-    if (tag_match && BTB_valid[btb_index]) begin
-        BTBtarget_o = btb_target_bypass;
-        BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || BTB_j_flag[btb_index];
+    if (tag_match) begin
+        BTBtarget_o = (BTB_we && (BTBwriteaddress_i == btb_index)) ? 
+                     BTBwritedata_i : BTB_target[btb_index];
+        BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || 
+                       BTB_j_flag[btb_index];
     end else begin
         BTBtarget_o = 32'b0;
         BranchTaken_o = 1'b0;
     end
 end
+
 always @(posedge clk) begin
     if (PHTwe_i) begin
         if (PHTincrement_i && PHT[PHTwriteaddress_i] < 2'b11)
