@@ -216,7 +216,7 @@ always @ (posedge clk) begin
         RdE_o    <=  5'b0;
         PHTwriteaddrE <= 5'b0;
         opE <= 7'b0;
-        BranchTakenE <= 1'b0
+        BranchTakenE <= 1'b0;
         funct3E <= 3'b0;
     end else begin 
         RD1E     <= RD1D;
