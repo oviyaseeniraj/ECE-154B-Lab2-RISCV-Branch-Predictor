@@ -168,7 +168,7 @@ always @(*) begin
         end else if (BTB_b_flag[btb_index]) begin
             // Branch depends on PHT prediction
             BTBtarget_o = BTB_target[btb_index];
-            BranchTaken_o = (predict_taken == 1'b1);  // MSB of counter
+            BranchTaken_o = (PHT[PHTreadaddress_o][1] == 1'b1);  // MSB of counter
         end
     end
 end
