@@ -179,8 +179,8 @@ always @(*) begin
 
     // Update BTB on taken branches (including bne)
     BTBweE = (opE == instr_branch_op && 
-             ((funct3E == 3'b000 && ZeroE_o) ||  // beq (taken if ZeroE_o == 1)
-              (funct3E == 3'b001 && !ZeroE_o)))  // bne (taken if ZeroE_o == 0)
+             ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq (taken if ZeroE_o == 1)
+              (funct3E == instr_bne_funct3 && !ZeroE_o)))  // bne (taken if ZeroE_o == 0)
            || opE == instr_jal_op 
            || opE == instr_jalr_op;
     
@@ -189,13 +189,13 @@ always @(*) begin
     
     // Increment PHT counter if branch is taken (correct for both beq and bne)
     PHTincE = (opE == instr_branch_op && 
-              ((funct3E == 3'b000 && ZeroE_o) ||   // beq taken
-               (funct3E == 3'b001 && !ZeroE_o)));  // bne taken
+              ((funct3E == instr_beq_funct3 && ZeroE_o) ||   // beq taken
+               (funct3E == instr_bne_funct3 && !ZeroE_o)));  // bne taken
     
     // Reset GHR on misprediction
     GHRresetE = (opE == instr_branch_op) && (BranchTakenE != 
-               ((funct3E == 3'b000 && ZeroE_o) ||  // beq taken
-                (funct3E == 3'b001 && !ZeroE_o))); // bne taken
+               ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq taken
+                (funct3E == instr_bne_funct3 && !ZeroE_o))); // bne taken
 
     $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
         BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);
