@@ -179,26 +179,26 @@ always @(*) begin
     BTBwritedataE  = PCTargetE;
 
     // Update BTB on taken branches (including bne)
-    BTBweE = (opE == instr_branch_op && 
+    BTBweE = (top.riscv.c.BranchE && 
              ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq (taken if ZeroE_o == 1)
               (funct3E == instr_bne_funct3 && !ZeroE_o)))  // bne (taken if ZeroE_o == 0)
            || opE == instr_jal_op 
            || opE == instr_jalr_op;
     
     // Update PHT on all branches
-    PHTweE = (opE == instr_branch_op);
+    PHTweE = top.riscv.c.BranchE;
     
     // Increment PHT counter if branch is taken (correct for both beq and bne)
-    PHTincE = (opE == instr_branch_op && 
+    PHTincE = (top.riscv.c.BranchE && 
               ((funct3E == instr_beq_funct3 && ZeroE_o) ||   // beq taken
                (funct3E == instr_bne_funct3 && !ZeroE_o)));  // bne taken
     
     // Reset GHR on misprediction
-    GHRresetE = (opE == instr_branch_op) && (BranchTakenE != 
+    GHRresetE = top.riscv.c.BranchE && (BranchTakenE != 
                ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq taken
                 (funct3E == instr_bne_funct3 && !ZeroE_o))); // bne taken
     
-    Mispredict_o = GHRresetE || ((opE == instr_jal_op || opE == instr_jalr_op) && !BranchTakenE);
+    Mispredict_o = GHRresetE || (top.riscv.c.dp.JumpE && !BranchTakenE);
 
     $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
         BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);
