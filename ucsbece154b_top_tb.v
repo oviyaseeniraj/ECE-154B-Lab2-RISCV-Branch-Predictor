@@ -10,13 +10,23 @@ ucsbece154b_top top (
     .clk(clk), .reset(reset)
 );
 
-// Performance counters
+wire [31:0] reg_s0 = top.riscv.dp.rf.s0;
+wire [31:0] reg_s1 = top.riscv.dp.rf.s1;
+wire [31:0] reg_s2 = top.riscv.dp.rf.s2;
+wire [31:0] reg_s3 = top.riscv.dp.rf.s3;
+wire [31:0] reg_t0 = top.riscv.dp.rf.t0;
+wire [31:0] reg_t1 = top.riscv.dp.rf.t1;
+wire [31:0] reg_t2 = top.riscv.dp.rf.t2;
+wire [31:0] reg_t3 = top.riscv.dp.rf.t3;
+wire [31:0] reg_t4 = top.riscv.dp.rf.t4;
+wire [31:0] reg_t5 = top.riscv.dp.rf.t5;
+wire [31:0] reg_t6 = top.riscv.dp.rf.t6;
+
 integer cycle_count;
 integer instruction_count;
 integer branch_count, branch_miss_count;
 integer jump_count, jump_miss_count;
 
-// Pipeline state tracking
 reg BranchTakenD, BranchTakenE;
 reg [31:0] BranchPCD, BranchPCE;
 reg mispredicted;
@@ -28,9 +38,11 @@ always @(posedge clk) begin
         BranchPCD <= 0;
         BranchPCE <= 0;
     end else begin
-        // Track prediction through pipeline
+        // Capture prediction in Decode stage
         BranchTakenD <= top.riscv.dp.BranchTakenF;
         BranchPCD <= top.riscv.dp.PCF_o;
+        
+        // Propagate to Execute stage
         BranchTakenE <= BranchTakenD;
         BranchPCE <= BranchPCD;
     end
@@ -62,13 +74,13 @@ initial begin
                 7'b1100011: begin // branch
                     branch_count = branch_count + 1;
 
-                    // case (top.riscv.dp.funct3E)
-                    //     3'b000: mispredicted = (BranchTakenE !== top.riscv.dp.ZeroE_o);  // beq
-                    //     3'b001: mispredicted = (BranchTakenE !== ~top.riscv.dp.ZeroE_o); // bne
-                    //     default: mispredicted = 0;
-                    // endcase
+                    case (top.riscv.dp.funct3E)
+                        3'b000: mispredicted = (BranchTakenE !== top.riscv.dp.ZeroE_o);  // beq
+                        3'b001: mispredicted = (BranchTakenE !== ~top.riscv.dp.ZeroE_o); // bne
+                        default: mispredicted = 0;
+                    endcase
 
-                    if (top.riscv.dp.Mispredict_o)
+                    if (mispredicted)
                         branch_miss_count = branch_miss_count + 1;
 
                     $display("[BRANCH] PC=%h TakenE=%b ZeroE=%b funct3=%b MISP=%b", 
