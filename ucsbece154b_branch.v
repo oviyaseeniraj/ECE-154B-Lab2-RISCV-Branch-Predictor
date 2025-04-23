@@ -97,7 +97,7 @@ end
 always @(posedge clk) begin
     tag_match_d <= tag_match;
     tag_match_e <= tag_match_d;
-    op_e <= op_d;
+    op_e <= op_i;
 end
 
 always @(posedge clk) begin
