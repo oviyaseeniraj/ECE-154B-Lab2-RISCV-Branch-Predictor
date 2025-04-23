@@ -31,6 +31,8 @@ reg BranchTakenD, BranchTakenE;
 reg [31:0] BranchPCD, BranchPCE;
 reg mispredicted;
 
+integer i;
+
 always @(posedge clk) begin
     if (reset) begin
         BranchTakenD <= 0;
@@ -63,7 +65,7 @@ initial begin
     @(posedge clk);
     reset = 0;
 
-    forever begin
+    for (i = 0; i < 10000; i = i + 1) begin
         @(posedge clk);
         cycle_count = cycle_count + 1;
 
@@ -98,37 +100,35 @@ initial begin
             
             endcase
         end
-
-        if (reg_t3 == 10) begin
-            $display("---- PROGRAM COMPLETE ----");
-            $display("Register values:");
-            $display("s0 (countx)      = %0d", reg_s0);
-            $display("s1 (county)      = %0d", reg_s1);
-            $display("s2 (countz)      = %0d", reg_s2);
-            $display("s3 (innercount)  = %0d", reg_s3);
-            $display("t0 = %0d", reg_t0);
-            $display("t1 = %0d", reg_t1);
-            $display("t2 = %0d", reg_t2);
-            $display("t3 = %0d", reg_t3);
-            $display("t4 = %0d", reg_t4);
-            $display("t5 = %0d", reg_t5);
-            $display("t6 = %0d", reg_t6);
-            $display("--------------------------");
-            $display("Performance:");
-            $display("Cycle count:            %0d", cycle_count);
-            $display("Instruction count:      %0d", instruction_count);
-            $display("CPI:                    %0f", 1.0 * cycle_count / instruction_count);
-            $display("Branch count:           %0d", branch_count);
-            $display("Branch mispredictions:  %0d", branch_miss_count);
-            $display("Branch misprediction rate: %0f%%", 
-                (branch_count > 0) ? 100.0 * branch_miss_count / branch_count : 0.0);
-            $display("Jump count:             %0d", jump_count);
-            $display("Jump mispredictions:    %0d", jump_miss_count);
-            $display("Jump misprediction rate:   %0f%%",
-                (jump_count > 0) ? 100.0 * jump_miss_count / jump_count : 0.0);
-            $stop;
-        end
     end
+
+    $display("---- PROGRAM COMPLETE ----");
+    $display("Register values:");
+    $display("s0 (countx)      = %0d", reg_s0);
+    $display("s1 (county)      = %0d", reg_s1);
+    $display("s2 (countz)      = %0d", reg_s2);
+    $display("s3 (innercount)  = %0d", reg_s3);
+    $display("t0 = %0d", reg_t0);
+    $display("t1 = %0d", reg_t1);
+    $display("t2 = %0d", reg_t2);
+    $display("t3 = %0d", reg_t3);
+    $display("t4 = %0d", reg_t4);
+    $display("t5 = %0d", reg_t5);
+    $display("t6 = %0d", reg_t6);
+    $display("--------------------------");
+    $display("Performance:");
+    $display("Cycle count:            %0d", cycle_count);
+    $display("Instruction count:      %0d", instruction_count);
+    $display("CPI:                    %0f", 1.0 * cycle_count / instruction_count);
+    $display("Branch count:           %0d", branch_count);
+    $display("Branch mispredictions:  %0d", branch_miss_count);
+    $display("Branch misprediction rate: %0f%%", 
+        (branch_count > 0) ? 100.0 * branch_miss_count / branch_count : 0.0);
+    $display("Jump count:             %0d", jump_count);
+    $display("Jump mispredictions:    %0d", jump_miss_count);
+    $display("Jump misprediction rate:   %0f%%",
+        (jump_count > 0) ? 100.0 * jump_miss_count / jump_count : 0.0);
+    $stop;
 end
 
 endmodule
