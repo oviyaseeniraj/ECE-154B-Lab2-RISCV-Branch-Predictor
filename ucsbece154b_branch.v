@@ -154,7 +154,7 @@ assign btb_j = BTB_j_flag[btb_index];
 assign btb_valid = BTB_valid[btb_index];
 
 always @(*) begin
-    if (tag_match_d && BTB_valid[btb_index]) begin
+    if (tag_match && BTB_valid[btb_index]) begin
         BTBtarget_o = btb_target_bypass;
         BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || BTB_j_flag[btb_index];
     end else begin
