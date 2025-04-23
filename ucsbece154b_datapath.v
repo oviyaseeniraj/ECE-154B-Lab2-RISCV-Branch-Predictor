@@ -177,8 +177,8 @@ always @(*) begin
     BTBwritedataE  = PCTargetE;
     BTBweE         = ((opE == instr_branch_op && ZeroE_o == 1'b0) || opE == instr_jal_op || opE == instr_jalr_op);
     PHTweE         = (opE == instr_branch_op);
-    PHTincE        = (opE == instr_branch_op && ZeroE_o == 1'b0);
-    GHRresetE      = (opE == instr_branch_op) && (BranchTakenE != ~ZeroE_o);
+    PHTincE        = (opE == instr_branch_op && ZeroE_o);
+    GHRresetE      = (opE == instr_branch_op) && (BranchTakenE != ZeroE_o);
 
     $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
         BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);
