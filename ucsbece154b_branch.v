@@ -159,7 +159,7 @@ wire [31:0] btb_target_bypass = (BTB_we && BTBwriteaddress_i == btb_index) ?
                                 BTBwritedata_i : BTB_target[btb_index];
 
 always @(*) begin
-    tag_match <= BTB_valid[btb_index] && (btb_tag_in == BTB_tag[btb_index]);
+    tag_match <= btb_tag_in == BTB_tag[btb_index];
     if (tag_match && BTB_valid[btb_index]) begin
         BTBtarget_o = btb_target_bypass;
         BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || BTB_j_flag[btb_index];
