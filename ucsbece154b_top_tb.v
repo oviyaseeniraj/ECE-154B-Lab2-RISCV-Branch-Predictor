@@ -27,6 +27,26 @@ integer instruction_count;
 integer branch_count, branch_miss_count;
 integer jump_count, jump_miss_count;
 
+reg BranchPredictionD, BranchPredictionE;
+reg [31:0] BranchPCD, BranchPCE;
+
+always @(posedge clk) begin
+    if (reset) begin
+        BranchPredictionD <= 0;
+        BranchPredictionE <= 0;
+        BranchPCD <= 0;
+        BranchPCE <= 0;
+    end else begin
+        // Capture prediction in Decode stage
+        BranchPredictionD <= top.riscv.dp.BranchTakenF;
+        BranchPCD <= top.riscv.dp.PCF_o;
+        
+        // Propagate to Execute stage
+        BranchPredictionE <= BranchPredictionD;
+        BranchPCE <= BranchPCD;
+    end
+end
+
 initial begin
     $display("Begin simulation.");
 
@@ -52,19 +72,21 @@ initial begin
             case (top.riscv.dp.op_o)
                 7'b1100011: begin // branch
                     branch_count = branch_count + 1;
-                    if (top.riscv.dp.BranchTakenF !== top.riscv.dp.ZeroE_o)
+                    if (BranchTakenE !== top.riscv.dp.ZeroE_o)
                         branch_miss_count = branch_miss_count + 1;
                     $display("[BRANCH] PC=%h TakenF=%b ZeroE=%b MISP=%b", 
-                        top.riscv.dp.PCF_o, top.riscv.dp.BranchTakenF, top.riscv.dp.ZeroE_o,
-                        top.riscv.dp.BranchTakenF !== top.riscv.dp.ZeroE_o);
+                        BranchPCE, BranchTakenE, top.riscv.dp.ZeroE_o,
+                        BranchTakenE !== top.riscv.dp.ZeroE_o);
                 end
                 7'b1101111, 7'b1100111: begin // jal / jalr
                     jump_count = jump_count + 1;
                     if (!top.riscv.dp.BranchTakenF)
                         jump_miss_count = jump_miss_count + 1;
                     $display("[JUMP] PC=%h TakenF=%b MISP=%b", 
-                        top.riscv.dp.PCF_o, top.riscv.dp.BranchTakenF, !top.riscv.dp.BranchTakenF);
+                        BranchPCE, BranchTakenE, !BranchTakenE);
                 end
+
+            
             endcase
         end
 
