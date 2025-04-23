@@ -72,11 +72,20 @@ initial begin
             case (top.riscv.dp.opE)
                 7'b1100011: begin // branch
                     branch_count = branch_count + 1;
-                    if (BranchTakenE !== top.riscv.dp.ZeroE_o)
+                    reg mispredicted;
+
+                    case (top.riscv.dp.funct3E)
+                        3'b000: mispredicted = (BranchTakenE !== top.riscv.dp.ZeroE_o);  // beq
+                        3'b001: mispredicted = (BranchTakenE !== ~top.riscv.dp.ZeroE_o); // bne
+                        default: mispredicted = 0;
+                    endcase
+
+                    if (mispredicted)
                         branch_miss_count = branch_miss_count + 1;
-                    $display("[BRANCH] PC=%h TakenF=%b ZeroE=%b MISP=%b", 
+
+                    $display("[BRANCH] PC=%h TakenF=%b ZeroE=%b funct3=%b MISP=%b", 
                         BranchPCE, BranchTakenE, top.riscv.dp.ZeroE_o,
-                        BranchTakenE !== top.riscv.dp.ZeroE_o);
+                        top.riscv.dp.funct3E, mispredicted);
                 end
                 7'b1101111, 7'b1100111: begin // jal / jalr
                     jump_count = jump_count + 1;
