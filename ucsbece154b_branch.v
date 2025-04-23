@@ -1,7 +1,7 @@
 // DEBUG-ENHANCED ucsbece154b_branch.v
 module ucsbece154b_branch #(
-    parameter NUM_BTB_ENTRIES = 64,
-    parameter NUM_GHR_BITS    = 6
+    parameter NUM_BTB_ENTRIES = 16,
+    parameter NUM_GHR_BITS    = 4
 ) (
     input               clk, 
     input               reset_i,
