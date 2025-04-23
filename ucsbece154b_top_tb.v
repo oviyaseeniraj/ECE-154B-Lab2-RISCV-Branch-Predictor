@@ -27,22 +27,22 @@ integer instruction_count;
 integer branch_count, branch_miss_count;
 integer jump_count, jump_miss_count;
 
-reg BranchPredictionD, BranchPredictionE;
+reg BranchTakenD, BranchTakenE;
 reg [31:0] BranchPCD, BranchPCE;
 
 always @(posedge clk) begin
     if (reset) begin
-        BranchPredictionD <= 0;
-        BranchPredictionE <= 0;
+        BranchTakenD <= 0;
+        BranchTakenE <= 0;
         BranchPCD <= 0;
         BranchPCE <= 0;
     end else begin
         // Capture prediction in Decode stage
-        BranchPredictionD <= top.riscv.dp.BranchTakenF;
+        BranchTakenD <= top.riscv.dp.BranchTakenF;
         BranchPCD <= top.riscv.dp.PCF_o;
         
         // Propagate to Execute stage
-        BranchPredictionE <= BranchPredictionD;
+        BranchTakenE <= BranchTakenD;
         BranchPCE <= BranchPCD;
     end
 end
