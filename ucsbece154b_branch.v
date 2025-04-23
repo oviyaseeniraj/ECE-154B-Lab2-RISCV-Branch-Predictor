@@ -42,6 +42,7 @@ reg [31:0] tag_d, tag_e;
 reg tag_match_d = 1'b0;
 reg tag_match_e = 1'b0;
 reg [6:0] op_e = 7'b0;
+reg [31:0] btb_write_pc = 32'b0;
 
 initial begin
     BTB_target[0] = 32'b0; BTB_tag[0]    = 32'b0; BTB_j_flag[0] = 1'b0; BTB_b_flag[0] = 1'b0; BTB_valid[0]  = 1'b0;
@@ -95,6 +96,11 @@ always @(posedge clk) begin
 end
 
 always @(posedge clk) begin
+    if (BTB_we)
+        btb_write_pc <= pc_i;
+ end
+
+always @(posedge clk) begin
     tag_match_d <= tag_match;
     tag_match_e <= tag_match_d;
     op_e <= op_i;
@@ -124,7 +130,7 @@ always @(posedge clk) begin
 
     if (BTB_we && (!tag_match_e || !BTB_valid[BTBwriteaddress_i])) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
-        BTB_tag[BTBwriteaddress_i]    <= tag_e;
+        BTB_tag[BTBwriteaddress_i]    <= btb_write_pc;
         BTB_j_flag[BTBwriteaddress_i] <= (op_e == instr_jal_op || op_e == instr_jalr_op);
         BTB_b_flag[BTBwriteaddress_i] <= (op_e == instr_branch_op);
         BTB_valid[BTBwriteaddress_i]  <= 1'b1;
