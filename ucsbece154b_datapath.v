@@ -185,7 +185,7 @@ always @(*) begin
     is_branch = (opE == instr_branch_op);
     is_jump = (opE == instr_jal_op) || (opE == instr_jalr_op);
     branch_taken = is_branch && ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq taken
-                   (funct3E == instr_bne_funct3 && !ZeroE_o))
+                   (funct3E == instr_bne_funct3 && !ZeroE_o));
 
     // Update BTB on taken branches (including bne)
     BTBweE = branch_taken || is_jump;
