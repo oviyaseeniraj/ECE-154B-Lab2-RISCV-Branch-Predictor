@@ -173,8 +173,8 @@ ucsbece154b_alu alu (
     .zero_o(ZeroE_o)
 );
 
-wire branchActuallyTaken;
-wire jumpTaken;
+reg branchActuallyTaken;
+reg jumpTaken;
 // Branch predictor control logic (NEW)
 always @(*) begin
     BTBwriteaddrE  = PCE[6:2];
