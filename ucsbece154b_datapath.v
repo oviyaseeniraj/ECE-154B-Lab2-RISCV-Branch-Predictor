@@ -196,7 +196,7 @@ always @(*) begin
     PHTincE = branchActuallyTaken;
     
     // Reset GHR on misprediction
-    GHRresetE = ~(BranchTakenE ^ branchActuallyTaken)
+    GHRresetE = ~(BranchTakenE ^ branchActuallyTaken);
     
     Mispredict_o = GHRresetE || (jumpTaken && !BranchTakenE);
 
