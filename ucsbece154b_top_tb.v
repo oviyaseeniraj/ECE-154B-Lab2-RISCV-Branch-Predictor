@@ -72,33 +72,43 @@ initial begin
         if (!reset && top.riscv.dp.InstrD !== 32'b0) begin
             instruction_count = instruction_count + 1;
 
-            case (top.riscv.dp.opE)
-                7'b1100011: begin // branch
-                    branch_count = branch_count + 1;
+            if (top.riscv.c.BranchE) begin
+                branch_count = branch_count + 1;
+                if (top.riscv.dp.Mispredict_o)
+                    branch_miss_count = branch_miss_count + 1;
+            end
 
-                    // case (top.riscv.dp.funct3E)
-                    //     3'b000: mispredicted = (BranchTakenE !== top.riscv.dp.ZeroE_o);  // beq
-                    //     3'b001: mispredicted = (BranchTakenE !== ~top.riscv.dp.ZeroE_o); // bne
-                    //     default: mispredicted = 0;
-                    // endcase
+            if (top.riscv.c.JumpE) begin
+                jump_count = jump_count + 1;
+                if (!BranchTakenE)
+                    jump_miss_count = jump_miss_count + 1;
+            end
 
-                    if (top.riscv.dp.Mispredict_o)
-                        branch_miss_count = branch_miss_count + 1;
+            // case (top.riscv.dp.opE)
+            //     instr_branch_op: begin // branch
+            //         branch_count = branch_count + 1;
 
-                    $display("[BRANCH] PC=%h TakenE=%b ZeroE=%b funct3=%b MISP=%b", 
-                        BranchPCE, BranchTakenE, top.riscv.dp.ZeroE_o,
-                        top.riscv.dp.funct3E, mispredicted);
-                end
-                7'b1101111, 7'b1100111: begin // jal / jalr
-                    jump_count = jump_count + 1;
-                    if (!BranchTakenE)
-                        jump_miss_count = jump_miss_count + 1;
-                    $display("[JUMP] PC=%h TakenF=%b MISP=%b", 
-                        BranchPCE, BranchTakenE, !BranchTakenE);
-                end
+            //         // case (top.riscv.dp.funct3E)
+            //         //     3'b000: mispredicted = (BranchTakenE !== top.riscv.dp.ZeroE_o);  // beq
+            //         //     3'b001: mispredicted = (BranchTakenE !== ~top.riscv.dp.ZeroE_o); // bne
+            //         //     default: mispredicted = 0;
+            //         // endcase
 
-            
-            endcase
+            //         if (top.riscv.dp.Mispredict_o)
+            //             branch_miss_count = branch_miss_count + 1;
+
+            //         $display("[BRANCH] PC=%h TakenE=%b ZeroE=%b funct3=%b MISP=%b", 
+            //             BranchPCE, BranchTakenE, top.riscv.dp.ZeroE_o,
+            //             top.riscv.dp.funct3E, top.riscv.dp.Mispredict_o);
+            //     end
+            //     instr_jal_op, instr_jalr_op: begin // jal / jalr
+            //         jump_count = jump_count + 1;
+            //         if (!BranchTakenE)
+            //             jump_miss_count = jump_miss_count + 1;
+            //         $display("[JUMP] PC=%h TakenF=%b MISP=%b", 
+            //             BranchPCE, BranchTakenE, !BranchTakenE);
+            //     end
+            // endcase
         end
     end
 

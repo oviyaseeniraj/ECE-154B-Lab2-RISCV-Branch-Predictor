@@ -43,7 +43,7 @@ module ucsbece154b_controller (
 // ***** FETCH STAGE ***************************************
 
 // ***** DECODE STAGE **************************************
- wire RegWriteD, MemWriteD, JumpD, BranchD, ALUSrcD;
+ wire RegWriteD, MemWriteD, JumpD, ALUSrcD;
  reg BranchTypeD;
  wire [1:0] ResultSrcD; 
  reg [2:0] ALUControlD;
