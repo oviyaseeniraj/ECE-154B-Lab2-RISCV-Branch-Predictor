@@ -48,6 +48,7 @@ always @(posedge clk) begin
     end
 end
 
+integer i;
 initial begin
     $display("Begin simulation.");
 
@@ -63,7 +64,7 @@ initial begin
     @(posedge clk);
     reset = 0;
 
-    forever begin
+    for (i = 0; i < 10000; i = i + 1) begin
         @(posedge clk);
         cycle_count = cycle_count + 1;
 
@@ -98,8 +99,8 @@ initial begin
             
             endcase
         end
+    end
 
-        if (reg_t3 == 10) begin
             $display("---- PROGRAM COMPLETE ----");
             $display("Register values:");
             $display("s0 (countx)      = %0d", reg_s0);
@@ -127,8 +128,6 @@ initial begin
             $display("Jump misprediction rate:   %0f%%",
                 (jump_count > 0) ? 100.0 * jump_miss_count / jump_count : 0.0);
             $stop;
-        end
-    end
 end
 
 endmodule
