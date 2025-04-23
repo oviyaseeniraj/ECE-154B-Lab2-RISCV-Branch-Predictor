@@ -113,8 +113,7 @@ always @(posedge clk) begin
     end
     
     $display("[BTB TAG E MATCH] match_e=%b", tag_match_e);
-
-    // $display("[BTB TAG MATCH] match=%b", tag_match);
+    $display("[BTB TAG FETCH MATCH] match=%b", tag_match);
     $display("[BTB INDEX EXECUTE] index=%0d", BTBwriteaddress_i);
     $display("[BTB TAG EXEC PC] tag=%h", tag_e);
     $display("[BTB EXEC TAG FROM TABLE] tag=%h", BTB_tag[BTBwriteaddress_i]);
