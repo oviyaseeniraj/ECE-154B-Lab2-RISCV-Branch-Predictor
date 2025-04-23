@@ -210,8 +210,8 @@ module ucsbece154b_controller (
  assign lwStall = (ResultSrcE == 1) & ( (Rs1D_i == RdE_i) | (Rs2D_i == RdE_i) ) & (RdE_i != 0);
  assign StallF_o = lwStall;
  assign StallD_o = lwStall;
- assign FlushD_o = PCSrcE_o & Mispredict_i;
- assign FlushE_o = lwStall | (PCSrcE_o & Mispredict_i); 
+ assign FlushD_o = Mispredict_i;
+ assign FlushE_o = lwStall | Mispredict_i; 
   
 
 
