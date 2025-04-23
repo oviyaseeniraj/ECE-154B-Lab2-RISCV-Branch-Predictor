@@ -80,7 +80,7 @@ initial begin
                 end
                 7'b1101111, 7'b1100111: begin // jal / jalr
                     jump_count = jump_count + 1;
-                    if (!top.riscv.dp.BranchTakenE)
+                    if (!BranchTakenE)
                         jump_miss_count = jump_miss_count + 1;
                     $display("[JUMP] PC=%h TakenF=%b MISP=%b", 
                         BranchPCE, BranchTakenE, !BranchTakenE);
