@@ -143,7 +143,7 @@ always @(posedge clk) begin
 end
 
 
-wire [NUM_GHR_BITS-1:0] pc_xor_ghr = tag_e[NUM_GHR_BITS+1:2] ^ GHR;
+wire [NUM_GHR_BITS-1:0] pc_xor_ghr = pc_i[NUM_GHR_BITS+1:2] ^ GHR;
 assign PHTreadaddress_o = pc_xor_ghr;
 
 wire [1:0] pht_entry = PHT[pc_xor_ghr];
@@ -192,8 +192,8 @@ always @(posedge clk) begin
     if (reset_i || GHRreset_i) begin
         GHR <= {NUM_GHR_BITS{1'b0}};
     end else if (PHTincrement_i) begin
-        //GHR <= {GHR[NUM_GHR_BITS-2:0], BranchTaken_o};  // Shift in latest result
-        GHR <= {GHR[NUM_GHR_BITS-2:0], PHTincrement_i};
+        GHR <= {GHR[NUM_GHR_BITS-2:0], BranchTaken_o};  // Shift in latest result
+        //GHR <= {GHR[NUM_GHR_BITS-2:0], PHTincrement_i};
     end
 end
 
