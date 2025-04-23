@@ -168,7 +168,7 @@ always @(*) begin
         end else if (BTB_b_flag[btb_index]) begin
             // Branch depends on PHT prediction
             BTBtarget_o = BTB_target[btb_index];
-            BranchTaken_o = (PHT[pc_xor_ghr][1] == 1'b1);  // MSB of counter
+            BranchTaken_o = (PHT[GHR] == 1'b1);  // MSB of counter
             $display("[BRANCHTAKEN] addr=%0d PHTval=%b BranchTaken_o=%b", 
                  pc_xor_ghr, PHT[pc_xor_ghr][1], BranchTaken_o);
         end
