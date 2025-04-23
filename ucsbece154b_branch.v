@@ -99,8 +99,15 @@ always @ (posedge clk) begin
             BTB_j_flag[i] <= 1'b0;
             BTB_b_flag[i] <= 1'b0;
             BTB_valid[i]  <= 1'b0;
-            PHT[i] <= 2'b10; // Initialize PHT to weakly taken
         end
+
+        // Initialize PHT to weakly taken
+         for (i = 0; i < (1 << NUM_GHR_BITS); i = i + 1) begin
+             PHT[i] <= 2'b10;
+         end
+         
+         GHR <= {NUM_GHR_BITS{1'b0}};
+         
     end
 end
 
