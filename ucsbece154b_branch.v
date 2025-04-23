@@ -107,7 +107,7 @@ always @ (posedge clk) begin
          end
          
          GHR <= {NUM_GHR_BITS{1'b0}};
-         
+
     end
 end
 
@@ -173,9 +173,6 @@ end
 wire [NUM_GHR_BITS-1:0] pc_xor_ghr = pc_i[NUM_GHR_BITS+1:2] ^ GHR;
 assign PHTreadaddress_o = pc_xor_ghr;
 wire predict_taken = PHT[pc_xor_ghr][1];
-
-wire [31:0] btb_target_bypass = (BTB_we && (BTBwriteaddress_i == btb_index)) ? 
-                                BTBwritedata_i : BTB_target[btb_index];
 
 assign btb_b = BTB_b_flag[btb_index];
 assign btb_j = BTB_j_flag[btb_index];
