@@ -83,7 +83,7 @@ initial begin
                     if (mispredicted)
                         branch_miss_count = branch_miss_count + 1;
 
-                    $display("[BRANCH] PC=%h TakenF=%b ZeroE=%b funct3=%b MISP=%b", 
+                    $display("[BRANCH] PC=%h TakenE=%b ZeroE=%b funct3=%b MISP=%b", 
                         BranchPCE, BranchTakenE, top.riscv.dp.ZeroE_o,
                         top.riscv.dp.funct3E, mispredicted);
                 end
