@@ -127,6 +127,7 @@ end
 
 // ***** EXECUTE STAGE ******************************
 reg [31:0] RD1E, RD2E, PCPlus4E;
+reg [6:0] opE;
 
 reg [31:0] ForwardDataM;
 
@@ -171,10 +172,10 @@ ucsbece154b_alu alu (
 always @(*) begin
     BTBwriteaddrE  = PCE[6:2];
     BTBwritedataE  = PCTargetE;
-    BTBweE         = ((op_o == instr_branch_op && ZeroE_o == 1'b0) || op_o == instr_jal_op || op_o == instr_jalr_op);
-    PHTweE         = (op_o == instr_branch_op);
-    PHTincE        = (op_o == instr_branch_op && ZeroE_o == 1'b0);
-    GHRresetE      = (op_o == instr_branch_op) && (BranchTakenF != ~ZeroE_o);
+    BTBweE         = ((opE == instr_branch_op && ZeroE_o == 1'b0) || opE == instr_jal_op || opE == instr_jalr_op);
+    PHTweE         = (opE == instr_branch_op);
+    PHTincE        = (opE == instr_branch_op && ZeroE_o == 1'b0);
+    GHRresetE      = (opE == instr_branch_op) && (BranchTakenF != ~ZeroE_o);
 
     $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
         BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);
@@ -191,6 +192,7 @@ always @ (posedge clk) begin
         Rs2E_o   <=  5'b0;
         RdE_o    <=  5'b0;
         PHTwriteaddrE <= 5'b0;
+        opE <= 7'b0;
     end else begin 
         RD1E     <= RD1D;
         RD2E     <= RD2D;
@@ -201,6 +203,7 @@ always @ (posedge clk) begin
         Rs2E_o   <= Rs2D_o;
         RdE_o    <= RdD;
         PHTwriteaddrE <= PHTwriteaddrD;
+        opE <= op_o;
     end 
 end
 
