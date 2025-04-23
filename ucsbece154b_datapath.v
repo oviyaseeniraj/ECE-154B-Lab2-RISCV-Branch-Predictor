@@ -179,8 +179,8 @@ always @(*) begin
 
     // Update BTB on taken branches (including bne)
     BTBweE = (opE == instr_branch_op && 
-             ((funct3_o == 3'b000 && ZeroE_o) ||  // beq (taken if ZeroE_o == 1)
-              (funct3_o == 3'b001 && !ZeroE_o)))  // bne (taken if ZeroE_o == 0)
+             ((funct3E == 3'b000 && ZeroE_o) ||  // beq (taken if ZeroE_o == 1)
+              (funct3E == 3'b001 && !ZeroE_o)))  // bne (taken if ZeroE_o == 0)
            || opE == instr_jal_op 
            || opE == instr_jalr_op;
     
