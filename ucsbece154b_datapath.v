@@ -34,17 +34,17 @@ module ucsbece154b_datapath (
 
 `include "ucsbece154b_defines.vh"
 
-// Early signal definitions
+// FIXED: Moved earlier to avoid undefined reference
 reg [31:0] PCE;           // Program counter in EX stage
 reg [31:0] ExtImmE;       // Immediate in EX stage
-wire [31:0] PCTargetE = PCE + ExtImmE;
+wire [31:0] PCTargetE = PCE + ExtImmE;  // FIXED: Define early
 reg [31:0] ResultW;
 
-// Branch predictor signals
+// NEW: Internal signals for branch predictor
 wire [31:0] BTBtargetF;
 wire BranchTakenF;
-wire [4:0] PHTreadaddrF;
-reg  [4:0] PHTwriteaddrD, PHTwriteaddrE;
+wire [4:0] PHTreadaddrF;     // output from branch predictor
+reg  [4:0] PHTwriteaddrD, PHTwriteaddrE;    // NEW: FIXED — now legal to assign bc reg not wire
 reg PHTweE, PHTincE;
 reg GHRresetE;
 reg BTBweE;
@@ -52,7 +52,7 @@ reg BranchTakenD, BranchTakenE;
 reg [4:0] BTBwriteaddrE;
 reg [31:0] BTBwritedataE;
 
-// Branch predictor instantiation
+// NEW: Branch predictor instantiation
 ucsbece154b_branch #(32, 5) branch_predictor (
     .clk(clk),
     .reset_i(reset),
@@ -75,7 +75,7 @@ wire [31:0] PCPlus4F = PCF_o + 32'd4;
 wire [31:0] PCtargetF = BranchTakenF ? BTBtargetF : PCPlus4F;
 wire [31:0] PCnewF = PCSrcE_i ? PCTargetE : PCtargetF;
 
-always @(posedge clk) begin
+always @ (posedge clk) begin
     if (reset)        PCF_o <= pc_start;
     else if (!StallF_i) PCF_o <= PCnewF;
 end
@@ -173,33 +173,35 @@ ucsbece154b_alu alu (
     .zero_o(ZeroE_o)
 );
 
-// Execute stage branch predictor control
+// Branch predictor control logic (NEW)
 always @(*) begin
-    BTBwriteaddrE = PCE[6:2];
-    BTBwritedataE = PCTargetE;
-    
-    // Update BTB on taken branches or jumps
+    BTBwriteaddrE  = PCE[6:2];
+    BTBwritedataE  = PCTargetE;
+
+    // Update BTB on taken branches (including bne)
     BTBweE = (top.riscv.c.BranchE && 
-             ((funct3E == instr_beq_funct3 && ZeroE_o) ||
-              (funct3E == instr_bne_funct3 && !ZeroE_o))) ||
-             opE == instr_jal_op || 
-             opE == instr_jalr_op;
+             ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq (taken if ZeroE_o == 1)
+              (funct3E == instr_bne_funct3 && !ZeroE_o)))  // bne (taken if ZeroE_o == 0)
+           || opE == instr_jal_op 
+           || opE == instr_jalr_op;
     
-    // Update PHT on branches
+    // Update PHT on all branches
     PHTweE = top.riscv.c.BranchE;
     
-    // Increment PHT counter if branch taken
+    // Increment PHT counter if branch is taken (correct for both beq and bne)
     PHTincE = (top.riscv.c.BranchE && 
-              ((funct3E == instr_beq_funct3 && ZeroE_o) ||
-               (funct3E == instr_bne_funct3 && !ZeroE_o)));
+              ((funct3E == instr_beq_funct3 && ZeroE_o) ||   // beq taken
+               (funct3E == instr_bne_funct3 && !ZeroE_o)));  // bne taken
     
     // Reset GHR on misprediction
     GHRresetE = top.riscv.c.BranchE && (BranchTakenE != 
-               ((funct3E == instr_beq_funct3 && ZeroE_o) ||
-                (funct3E == instr_bne_funct3 && !ZeroE_o)));
+               ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq taken
+                (funct3E == instr_bne_funct3 && !ZeroE_o))); // bne taken
     
-    // Set mispredict signal
     Mispredict_o = GHRresetE || (top.riscv.c.JumpE && !BranchTakenE);
+
+    $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
+        BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);
 end
 
 always @ (posedge clk) begin
