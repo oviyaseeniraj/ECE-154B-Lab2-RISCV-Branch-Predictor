@@ -29,6 +29,7 @@ integer jump_count, jump_miss_count;
 
 reg BranchTakenD, BranchTakenE;
 reg [31:0] BranchPCD, BranchPCE;
+reg mispredicted;
 
 always @(posedge clk) begin
     if (reset) begin
@@ -72,7 +73,6 @@ initial begin
             case (top.riscv.dp.opE)
                 7'b1100011: begin // branch
                     branch_count = branch_count + 1;
-                    reg mispredicted;
 
                     case (top.riscv.dp.funct3E)
                         3'b000: mispredicted = (BranchTakenE !== top.riscv.dp.ZeroE_o);  // beq
