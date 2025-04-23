@@ -72,10 +72,7 @@ ucsbece154b_branch #(32, 5) branch_predictor (
 // ***** FETCH STAGE *********************************
 wire [31:0] PCPlus4F = PCF_o + 32'd4;
 wire [31:0] PCtargetF = BranchTakenF ? BTBtargetF : PCPlus4F;
-// wire [31:0] PCnewF = PCSrcE_i ? PCTargetE : PCtargetF;
-wire [31:0] PCnewF = PCSrcE_i ? PCTargetE :      // Misprediction correction
-                    BranchTakenF ? BTBtargetF :  // Predicted taken
-                    PCPlus4F;                   // Default next PC
+wire [31:0] PCnewF = PCSrcE_i ? PCTargetE : PCtargetF;
 
 always @ (posedge clk) begin
     if (reset)        PCF_o <= pc_start;
