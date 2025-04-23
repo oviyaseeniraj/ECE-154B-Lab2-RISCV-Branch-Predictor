@@ -169,6 +169,8 @@ always @(*) begin
             // Branch depends on PHT prediction
             BTBtarget_o = BTB_target[btb_index];
             BranchTaken_o = (PHT[tag_e[NUM_GHR_BITS+1:2] ^ GHR][1] == 1'b1);  // MSB of counter
+            $display("[BRANCHTAKEN] addr=%0d PHTval=%b BranchTaken_o=%b", 
+                 tag_e[NUM_GHR_BITS+1:2] ^ GHR, PHT[tag_e[NUM_GHR_BITS+1:2] ^ GHR][1], BranchTaken_o);
         end
     end
 end
