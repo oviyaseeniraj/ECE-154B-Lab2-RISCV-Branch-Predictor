@@ -44,52 +44,6 @@ reg tag_match_e = 1'b0;
 reg [6:0] op_e = 7'b0;
 reg [31:0] btb_write_pc = 32'b0;
 
-// initial begin
-//     BTB_target[0] = 32'b0; BTB_tag[0]    = 32'b0; BTB_j_flag[0] = 1'b0; BTB_b_flag[0] = 1'b0; BTB_valid[0]  = 1'b0;
-//     BTB_target[1] = 32'b0; BTB_tag[1]    = 32'b0; BTB_j_flag[1] = 1'b0; BTB_b_flag[1] = 1'b0; BTB_valid[1]  = 1'b0;
-//     BTB_target[2] = 32'b0; BTB_tag[2]    = 32'b0; BTB_j_flag[2] = 1'b0; BTB_b_flag[2] = 1'b0; BTB_valid[2]  = 1'b0;
-//     BTB_target[3] = 32'b0; BTB_tag[3]    = 32'b0; BTB_j_flag[3] = 1'b0; BTB_b_flag[3] = 1'b0; BTB_valid[3]  = 1'b0;
-//     BTB_target[4] = 32'b0; BTB_tag[4]    = 32'b0; BTB_j_flag[4] = 1'b0; BTB_b_flag[4] = 1'b0; BTB_valid[4]  = 1'b0;
-//     BTB_target[5] = 32'b0; BTB_tag[5]    = 32'b0; BTB_j_flag[5] = 1'b0; BTB_b_flag[5] = 1'b0; BTB_valid[5]  = 1'b0;
-//     BTB_target[6] = 32'b0; BTB_tag[6] = 32'b0; BTB_j_flag[6] = 1'b0; BTB_b_flag[6] = 1'b0; BTB_valid[6] = 1'b0;
-//     BTB_target[7] = 32'b0; BTB_tag[7] = 32'b0; BTB_j_flag[7] = 1'b0; BTB_b_flag[7] = 1'b0; BTB_valid[7] = 1'b0;
-//     BTB_target[8] = 32'b0; BTB_tag[8] = 32'b0; BTB_j_flag[8] = 1'b0; BTB_b_flag[8] = 1'b0; BTB_valid[8] = 1'b0;
-//     BTB_target[9] = 32'b0; BTB_tag[9] = 32'b0; BTB_j_flag[9] = 1'b0; BTB_b_flag[9] = 1'b0; BTB_valid[9] = 1'b0;
-//     BTB_target[10] = 32'b0; BTB_tag[10] = 32'b0; BTB_j_flag[10] = 1'b0; BTB_b_flag[10] = 1'b0; BTB_valid[10] = 1'b0;
-//     BTB_target[11] = 32'b0; BTB_tag[11] = 32'b0; BTB_j_flag[11] = 1'b0; BTB_b_flag[11] = 1'b0; BTB_valid[11] = 1'b0;
-//     BTB_target[12] = 32'b0; BTB_tag[12] = 32'b0; BTB_j_flag[12] = 1'b0; BTB_b_flag[12] = 1'b0; BTB_valid[12] = 1'b0;
-//     BTB_target[13] = 32'b0; BTB_tag[13] = 32'b0; BTB_j_flag[13] = 1'b0; BTB_b_flag[13] = 1'b0; BTB_valid[13] = 1'b0;
-//     BTB_target[14] = 32'b0; BTB_tag[14] = 32'b0; BTB_j_flag[14] = 1'b0; BTB_b_flag[14] = 1'b0; BTB_valid[14] = 1'b0;
-//     BTB_target[15] = 32'b0; BTB_tag[15] = 32'b0; BTB_j_flag[15] = 1'b0; BTB_b_flag[15] = 1'b0; BTB_valid[15] = 1'b0;
-//     BTB_target[16] = 32'b0; BTB_tag[16] = 32'b0; BTB_j_flag[16] = 1'b0; BTB_b_flag[16] = 1'b0; BTB_valid[16] = 1'b0;
-//     BTB_target[17] = 32'b0; BTB_tag[17] = 32'b0; BTB_j_flag[17] = 1'b0; BTB_b_flag[17] = 1'b0; BTB_valid[17] = 1'b0;
-//     BTB_target[18] = 32'b0; BTB_tag[18] = 32'b0; BTB_j_flag[18] = 1'b0; BTB_b_flag[18] = 1'b0; BTB_valid[18] = 1'b0;
-//     BTB_target[19] = 32'b0; BTB_tag[19] = 32'b0; BTB_j_flag[19] = 1'b0; BTB_b_flag[19] = 1'b0; BTB_valid[19] = 1'b0;
-//     BTB_target[20] = 32'b0; BTB_tag[20] = 32'b0; BTB_j_flag[20] = 1'b0; BTB_b_flag[20] = 1'b0; BTB_valid[20] = 1'b0;
-//     BTB_target[21] = 32'b0; BTB_tag[21] = 32'b0; BTB_j_flag[21] = 1'b0; BTB_b_flag[21] = 1'b0; BTB_valid[21] = 1'b0;
-//     BTB_target[22] = 32'b0; BTB_tag[22] = 32'b0; BTB_j_flag[22] = 1'b0; BTB_b_flag[22] = 1'b0; BTB_valid[22] = 1'b0;
-//     BTB_target[23] = 32'b0; BTB_tag[23] = 32'b0; BTB_j_flag[23] = 1'b0; BTB_b_flag[23] = 1'b0; BTB_valid[23] = 1'b0;
-//     BTB_target[24] = 32'b0; BTB_tag[24] = 32'b0; BTB_j_flag[24] = 1'b0; BTB_b_flag[24] = 1'b0; BTB_valid[24] = 1'b0;
-//     BTB_target[25] = 32'b0; BTB_tag[25] = 32'b0; BTB_j_flag[25] = 1'b0; BTB_b_flag[25] = 1'b0; BTB_valid[25] = 1'b0;
-//     BTB_target[26] = 32'b0; BTB_tag[26] = 32'b0; BTB_j_flag[26] = 1'b0; BTB_b_flag[26] = 1'b0; BTB_valid[26] = 1'b0;
-//     BTB_target[27] = 32'b0; BTB_tag[27] = 32'b0; BTB_j_flag[27] = 1'b0; BTB_b_flag[27] = 1'b0; BTB_valid[27] = 1'b0;
-//     BTB_target[28] = 32'b0; BTB_tag[28] = 32'b0; BTB_j_flag[28] = 1'b0; BTB_b_flag[28] = 1'b0; BTB_valid[28] = 1'b0;
-//     BTB_target[29] = 32'b0; BTB_tag[29] = 32'b0; BTB_j_flag[29] = 1'b0; BTB_b_flag[29] = 1'b0; BTB_valid[29] = 1'b0;
-//     BTB_target[30] = 32'b0; BTB_tag[30] = 32'b0; BTB_j_flag[30] = 1'b0; BTB_b_flag[30] = 1'b0; BTB_valid[30] = 1'b0;
-//     BTB_target[31] = 32'b0; BTB_tag[31] = 32'b0; BTB_j_flag[31] = 1'b0; BTB_b_flag[31] = 1'b0; BTB_valid[31] = 1'b0;
-
-//     // initialize PHT to weakly taken
-//     PHT[0] = 2'b01; PHT[1] = 2'b01; PHT[2] = 2'b01; PHT[3] = 2'b01;
-//     PHT[4] = 2'b01; PHT[5] = 2'b01; PHT[6] = 2'b01; PHT[7] = 2'b01;
-//     PHT[8] = 2'b01; PHT[9] = 2'b01; PHT[10] = 2'b01; PHT[11] = 2'b01;
-//     PHT[12] = 2'b01; PHT[13] = 2'b01; PHT[14] = 2'b01; PHT[15] = 2'b01;
-//     PHT[16] = 2'b01; PHT[17] = 2'b01; PHT[18] = 2'b01; PHT[19] = 2'b01;
-//     PHT[20] = 2'b01; PHT[21] = 2'b01; PHT[22] = 2'b01; PHT[23] = 2'b01;
-//     PHT[24] = 2'b01; PHT[25] = 2'b01; PHT[26] = 2'b01; PHT[27] = 2'b01;
-//     PHT[28] = 2'b01; PHT[29] = 2'b01; PHT[30] = 2'b01; PHT[31] = 2'b01;
-
-// end
-
 integer i;
 always @ (posedge clk) begin
     if (reset_i) begin
@@ -174,8 +128,10 @@ wire [NUM_GHR_BITS-1:0] pc_xor_ghr = pc_i[NUM_GHR_BITS+1:2] ^ GHR;
 assign PHTreadaddress_o = pc_xor_ghr;
 wire predict_taken = PHT[pc_xor_ghr][1];
 
-assign btb_b = BTB_b_flag[btb_index];
-assign btb_j = BTB_j_flag[btb_index];
+wire btb_hit = BTB_valid[btb_index] && (btb_tag_in == BTB_tag[btb_index]);
+assign btb_b = btb_hit ? BTB_b_flag[btb_index] : 1'b0;
+assign btb_j = btb_hit ? BTB_j_flag[btb_index] : 1'b0;
+
 assign btb_valid = BTB_valid[btb_index];
 
 always @(*) begin
