@@ -155,17 +155,11 @@ assign btb_valid = BTB_valid[btb_index];
 
 always @(*) begin
     if (tag_match && BTB_valid[btb_index]) begin
-        BranchTaken_o <= (BTB_b_flag[btb_index] && predict_taken) || BTB_j_flag[btb_index];
-    end
-    else begin
-        BranchTaken_o <= 1'b0;
-    end
-
-    if (tag_match_d && BTB_valid[btb_index]) begin
-        BTBtarget_o <= btb_target_bypass;  
+        BTBtarget_o = btb_target_bypass;
+        BranchTaken_o = (BTB_b_flag[btb_index] && predict_taken) || BTB_j_flag[btb_index];
     end else begin
-        BTBtarget_o <= 32'b0;
-
+        BTBtarget_o = 32'b0;
+        BranchTaken_o = 1'b0;
     end
 end
 always @(posedge clk) begin

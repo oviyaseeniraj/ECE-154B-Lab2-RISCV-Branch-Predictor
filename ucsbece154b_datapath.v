@@ -47,6 +47,7 @@ reg  [4:0] PHTwriteaddrD, PHTwriteaddrE;    // NEW: FIXED — now legal to assig
 reg PHTweE, PHTincE;
 reg GHRresetE;
 reg BTBweE;
+reg BranchTakenD, BranchTakenE;
 reg [4:0] BTBwriteaddrE;
 reg [31:0] BTBwritedataE;
 
@@ -117,11 +118,13 @@ always @ (posedge clk) begin
         PCPlus4D <= 32'b0;
         PCD      <= 32'b0;
         PHTwriteaddrD <= 5'b0;
+        BranchTakenD <= 1'b0;
     end else if (!StallD_i) begin 
         InstrD   <= InstrF_i;
         PCPlus4D <= PCPlus4F;
         PCD      <= PCF_o;
         PHTwriteaddrD <= PHTreadaddrF;
+        BranchTakenD <= BranchTakenF;
     end 
 end
 
@@ -175,7 +178,7 @@ always @(*) begin
     BTBweE         = ((opE == instr_branch_op && ZeroE_o == 1'b0) || opE == instr_jal_op || opE == instr_jalr_op);
     PHTweE         = (opE == instr_branch_op);
     PHTincE        = (opE == instr_branch_op && ZeroE_o == 1'b0);
-    GHRresetE      = (opE == instr_branch_op) && (BranchTakenF != ~ZeroE_o);
+    GHRresetE      = (opE == instr_branch_op) && (BranchTakenE != ~ZeroE_o);
 
     $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
         BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);
@@ -193,6 +196,7 @@ always @ (posedge clk) begin
         RdE_o    <=  5'b0;
         PHTwriteaddrE <= 5'b0;
         opE <= 7'b0;
+        BranchTakenE <= 1'b0;
     end else begin 
         RD1E     <= RD1D;
         RD2E     <= RD2D;
@@ -204,6 +208,7 @@ always @ (posedge clk) begin
         RdE_o    <= RdD;
         PHTwriteaddrE <= PHTwriteaddrD;
         opE <= op_o;
+        BranchTakenE <= BranchTakenD;
     end 
 end
 
