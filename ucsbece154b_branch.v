@@ -143,7 +143,7 @@ assign btb_j = BTB_j_flag[btb_index];
 assign btb_valid = BTB_valid[btb_index];
 
 // Immediate tag matching (no delays)
-wire tag_match = BTB_valid[btb_index] && (pc_i == BTB_tag[btb_index]);
+tag_match = BTB_valid[btb_index] && (pc_i == BTB_tag[btb_index]);
 
 always @(*) begin
     if (tag_match) begin
