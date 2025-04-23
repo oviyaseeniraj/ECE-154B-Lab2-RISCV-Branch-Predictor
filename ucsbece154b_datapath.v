@@ -173,10 +173,18 @@ ucsbece154b_alu alu (
     .zero_o(ZeroE_o)
 );
 
+reg branchActuallyTaken;
+reg jumpTaken;
 // Branch predictor control logic (NEW)
 always @(*) begin
     BTBwriteaddrE  = PCE[6:2];
     BTBwritedataE  = PCTargetE;
+
+    branchActuallyTaken = (opE == instr_branch_op) && 
+        ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq taken
+         (funct3E == instr_bne_funct3 && !ZeroE_o)); // bne taken
+
+    jumpTaken = (opE == instr_jal_op || opE == instr_jalr_op);
 
     // Update BTB on taken branches (including bne)
     BTBweE = (top.riscv.c.BranchE && 
