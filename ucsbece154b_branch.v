@@ -170,7 +170,7 @@ always @(*) begin
             BTBtarget_o = BTB_target[btb_index];
             BranchTaken_o = (PHT[pc_xor_ghr][1] == 1'b1);  // MSB of counter
             $display("[BRANCHTAKEN] addr=%0d PHTval=%b BranchTaken_o=%b", 
-                 tag_e[NUM_GHR_BITS+1:2] ^ GHR, PHT[tag_e[NUM_GHR_BITS+1:2] ^ GHR][1], BranchTaken_o);
+                 pc_xor_ghr, PHT[pc_xor_ghr][1], BranchTaken_o);
         end
     end
 end
@@ -192,8 +192,8 @@ always @(posedge clk) begin
     if (reset_i || GHRreset_i) begin
         GHR <= {NUM_GHR_BITS{1'b0}};
     end else if (PHTincrement_i) begin
-        GHR <= {GHR[NUM_GHR_BITS-2:0], BranchTaken_o};  // Shift in latest result
-        //GHR <= {GHR[NUM_GHR_BITS-2:0], PHTincrement_i};
+        //GHR <= {GHR[NUM_GHR_BITS-2:0], BranchTaken_o};  // Shift in latest result
+        GHR <= {GHR[NUM_GHR_BITS-2:0], PHTincrement_i};
     end
 end
 
