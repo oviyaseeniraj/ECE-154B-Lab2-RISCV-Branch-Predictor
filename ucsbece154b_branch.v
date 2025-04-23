@@ -142,6 +142,9 @@ wire predict_taken = pht_entry[1];
 wire [31:0] btb_target_bypass = (BTB_we && BTBwriteaddress_i == btb_index) ? 
                                 BTBwritedata_i : BTB_target[btb_index];
 
+assign btb_b = BTB_b_flag[btb_index];
+assign btb_j = BTB_j_flag[btb_index];
+
 always @(*) begin
     if (tag_match && BTB_valid[btb_index]) begin
         BTBtarget_o = btb_target_bypass;
