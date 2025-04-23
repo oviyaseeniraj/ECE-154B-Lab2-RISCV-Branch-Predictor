@@ -146,7 +146,8 @@ assign PHTreadaddress_o = pc_xor_ghr;
 wire [1:0] pht_entry = PHT[pc_xor_ghr];
 wire predict_taken = pht_entry[1];
 
-wire [31:0] btb_target_bypass = BTB_target[btb_index];
+wire [31:0] btb_target_bypass = (BTB_we && (BTBwriteaddress_i == btb_index)) ? 
+                                BTBwritedata_i : BTB_target[btb_index];
 
 assign btb_b = BTB_b_flag[btb_index];
 assign btb_j = BTB_j_flag[btb_index];
@@ -176,7 +177,7 @@ end
 always @(posedge clk) begin
     if (reset_i || GHRreset_i)
         GHR <= 0;
-    else if (op_i == instr_branch_op) begin
+    else if (op_e == instr_branch_op) begin
         GHR <= {GHR[NUM_GHR_BITS-2:0], ~PHTincrement_i};
         $display("[GHR UPDATE] new GHR=%b", {GHR[NUM_GHR_BITS-2:0], ~PHTincrement_i});
     end
