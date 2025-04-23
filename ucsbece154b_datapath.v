@@ -28,7 +28,8 @@ module ucsbece154b_datapath (
     input         [31:0] ReadDataM_i,
     input          [1:0] ResultSrcW_i,
     output reg     [4:0] RdW_o,
-    input          [1:0] ResultSrcM_i
+    input          [1:0] ResultSrcM_i,
+    output reg           Mispredict_o
 );
 
 `include "ucsbece154b_defines.vh"
@@ -196,6 +197,8 @@ always @(*) begin
     GHRresetE = (opE == instr_branch_op) && (BranchTakenE != 
                ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq taken
                 (funct3E == instr_bne_funct3 && !ZeroE_o))); // bne taken
+    
+    Mispredict_o = GHRresetE;
 
     $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
         BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);

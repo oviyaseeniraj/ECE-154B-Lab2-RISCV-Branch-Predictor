@@ -31,7 +31,8 @@ module ucsbece154b_controller (
     output reg           MemWriteM_o,
     output reg          RegWriteW_o,
     output reg    [1:0] ResultSrcW_o, 
-    output reg    [1:0] ResultSrcM_o
+    output reg    [1:0] ResultSrcM_o,
+    input               Mispredict_i
 );
 
 
@@ -209,8 +210,8 @@ module ucsbece154b_controller (
  assign lwStall = (ResultSrcE == 1) & ( (Rs1D_i == RdE_i) | (Rs2D_i == RdE_i) ) & (RdE_i != 0);
  assign StallF_o = lwStall;
  assign StallD_o = lwStall;
- assign FlushD_o = PCSrcE_o;
- assign FlushE_o = lwStall | PCSrcE_o; 
+ assign FlushD_o = Mispredict_i;
+ assign FlushE_o = lwStall | Mispredict_i; 
   
 
 

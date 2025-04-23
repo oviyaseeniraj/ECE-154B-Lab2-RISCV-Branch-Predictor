@@ -23,6 +23,7 @@ wire [2:0] ImmSrcD;
 wire [2:0] ALUControlE;
 wire [1:0] ForwardAE, ForwardBE, ResultSrcW, ResultSrcM;
 wire [4:0] Rs1D, Rs2D, Rs1E, Rs2E, RdE, RdM, RdW;
+wire mispredict;
 
 
 ucsbece154b_controller c (
@@ -51,7 +52,8 @@ ucsbece154b_controller c (
     .MemWriteM_o(MemWriteM_o),
     .RegWriteW_o(RegWriteW),
     .ResultSrcW_o (ResultSrcW),
-    .ResultSrcM_o (ResultSrcM) 
+    .ResultSrcM_o (ResultSrcM),
+    .Mispredict_i(mispredict) 
 );
 
 
@@ -85,6 +87,7 @@ ucsbece154b_datapath dp (
     .ReadDataM_i(ReadDataM_i),
     .ResultSrcW_i(ResultSrcW),
     .RdW_o(RdW),
-    .ResultSrcM_i (ResultSrcM)
+    .ResultSrcM_i (ResultSrcM),
+    .Mispredict_o(mispredict)
 );
 endmodule
