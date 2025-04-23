@@ -101,15 +101,16 @@ always @(posedge clk) begin
 end
 
 always @(posedge clk) begin
-    $display("[BTB INDEX] index=%0d", btb_index);
-    $display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
-    $display("[BTB TAG FROM TABLE] tag=%h", BTB_tag[btb_index]);
-    $display("[BTB VALID] valid=%b", BTB_valid[btb_index]);
     if (BTB_valid[btb_index]) begin
         tag_match <= (btb_tag_in == BTB_tag[btb_index]);
     end else begin
         tag_match <= 1'b0;
     end
+    
+    $display("[BTB INDEX] index=%0d", btb_index);
+    $display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
+    $display("[BTB TAG FROM TABLE] tag=%h", BTB_tag[btb_index]);
+    $display("[BTB VALID] valid=%b", BTB_valid[btb_index]);
 
     $display("[BTB TAG MATCH] match=%b", tag_match);
     $display("[BTB TAG E MATCH] match_e=%b", tag_match_e);
