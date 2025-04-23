@@ -146,7 +146,7 @@ assign PHTreadaddress_o = pc_xor_ghr;
 wire [1:0] pht_entry = PHT[pc_xor_ghr];
 wire predict_taken = pht_entry[1];
 
-wire [31:0] btb_target_bypass = (BTB_we && BTBwriteaddress_i == btb_index) ? 
+wire [31:0] btb_target_bypass = (BTB_we && (BTBwriteaddress_i == btb_index)) ? 
                                 BTBwritedata_i : BTB_target[btb_index];
 
 assign btb_b = BTB_b_flag[btb_index];
