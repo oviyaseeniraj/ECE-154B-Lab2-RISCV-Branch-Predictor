@@ -154,7 +154,7 @@ wire [31:0] btb_target_bypass = (BTB_we && (BTBwriteaddress_i == btb_index)) ?
 
 assign btb_b = BTB_b_flag[btb_index];
 assign btb_j = BTB_j_flag[btb_index];
-assign btb_valid = BTB_valid[btb_index];x
+assign btb_valid = BTB_valid[btb_index];
 
 always @(*) begin
     BTBtarget_o = 32'b0;
