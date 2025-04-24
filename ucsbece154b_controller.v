@@ -211,6 +211,6 @@ module ucsbece154b_controller (
  assign StallF_o = lwStall;
  assign StallD_o = lwStall;
  assign FlushD_o = Mispredict_i;
- assign FlushE_o = lwStall | Mispredict_i; 
+ assign FlushE_o = Mispredict_i; 
 
 endmodule
