@@ -57,12 +57,12 @@ initial begin
     for (i = 0; i < 500 && top.riscv.dp.PCF_o != 32'h00010064; i = i + 1) begin
         @(posedge clk);
 
-        if (op_e == instr_branch_op) begin
+        if (op_e == 7'b1100011) begin
             branch_count = branch_count + 1;
             if (top.riscv.dp.PCSrcE_i) begin
                 branch_miss_count = branch_miss_count + 1;
             end
-        end else if (op_e == instr_jal_op || op_e == instr_jalr_op) begin
+        end else if (op_e == 7'b1101111 || op_e == 7'b1100111) begin
             jump_count = jump_count + 1;
             if (top.riscv.dp.PCSrcE_i) begin
                 jump_miss_count = jump_miss_count + 1;
