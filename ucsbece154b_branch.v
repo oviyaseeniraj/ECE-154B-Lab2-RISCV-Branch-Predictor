@@ -139,7 +139,7 @@ always @(*) begin
     BranchTaken_o = 1'b0;
 
     if (BTB_valid[btb_index] && tag_match) begin
-        $display("[BJ] pc=%b b=%b j=%b", 
+        $display("[BJ] pc=%h b=%b j=%b", 
             BTB_tag[btb_index], BTB_b_flag[btb_index], BTB_j_flag[btb_index]);
         if (BTB_j_flag[btb_index]) begin
             // Jumps are always taken
