@@ -73,8 +73,17 @@ ucsbece154b_branch #(32, 5) branch_predictor (
 // ***** FETCH STAGE *********************************
 wire [31:0] PCPlus4F = PCF_o + 32'd4;
 wire [31:0] PCtargetF = BranchTakenF ? BTBtargetF : PCPlus4F;
+<<<<<<< HEAD
 wire [31:0] PCtargetE = BranchTakenF ? PCPlus4F : PCTargetE;
 wire [31:0] PCnewF = Mispredict_o ? PCtargetE : PCtargetF;
+=======
+//wire [31:0] PCnewF = Mispredict_o ? PCTargetE : PCtargetF;
+wire [31:0] PCnewF = 
+    Mispredict_o ? 
+        (BranchActuallyTakenE ? PCTargetE : PCPlus4F)  // Correct misprediction
+    : 
+        PCtargetF;  // Follow prediction
+>>>>>>> 799e7b2 (pls)
 
 always @ (posedge clk) begin
     if (reset)        PCF_o <= pc_start;
@@ -174,37 +183,32 @@ ucsbece154b_alu alu (
     .zero_o(ZeroE_o)
 );
 
-// Branch predictor control logic (NEW)
+// Determine actual branch outcome
+wire BranchActuallyTakenE = 
+    (opE == instr_branch_op && 
+     ((funct3E == instr_beq_funct3 && ZeroE_o) ||   // BEQ taken
+      (funct3E == instr_bne_funct3 && !ZeroE_o)))   // BNE taken
+    || opE == instr_jal_op 
+    || opE == instr_jalr_op;
+
+// Misprediction cases
+wire MispredictDirectionE = 
+    (opE == instr_branch_op) && (BranchTakenE != BranchActuallyTakenE);
+wire MispredictTargetE = 
+    (opE == instr_jal_op || opE == instr_jalr_op) && (BTBtargetF != PCTargetE);
+assign Mispredict_o = MispredictDirectionE || MispredictTargetE;
+
+// BTB/PHT updates (unchanged from your code)
 always @(*) begin
     BTBwriteaddrE  = PCE[6:2];
     BTBwritedataE  = PCTargetE;
-
-    // Update BTB on taken branches (including bne)
-    BTBweE = (opE == instr_branch_op && 
-             ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq (taken if ZeroE_o == 1)
-              (funct3E == instr_bne_funct3 && !ZeroE_o)))  // bne (taken if ZeroE_o == 0)
-           || opE == instr_jal_op 
-           || opE == instr_jalr_op;
-    
-    // Update PHT on all branches
+    BTBweE = (opE == instr_branch_op && BranchActuallyTakenE) 
+             || opE == instr_jal_op 
+             || opE == instr_jalr_op;
     PHTweE = (opE == instr_branch_op);
-    
-    // Increment PHT counter if branch is taken (correct for both beq and bne)
-    PHTincE = (opE == instr_branch_op && 
-              ((funct3E == instr_beq_funct3 && ZeroE_o) ||   // beq taken
-               (funct3E == instr_bne_funct3 && !ZeroE_o)));  // bne taken
-    
-    // Reset GHR on misprediction
-    GHRresetE = (opE == instr_branch_op) && (BranchTakenE != 
-               ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq taken
-                (funct3E == instr_bne_funct3 && !ZeroE_o))); // bne taken
-    
-    Mispredict_o = GHRresetE || ((opE == instr_jal_op || opE == instr_jalr_op) && !BranchTakenE);
-
-    $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
-        BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);
+    PHTincE = (opE == instr_branch_op && BranchActuallyTakenE);
+    GHRresetE = MispredictDirectionE;  // Reset GHR on wrong direction
 end
-
 always @ (posedge clk) begin
     if (reset | FlushE_i) begin
         RD1E     <= 32'b0;
