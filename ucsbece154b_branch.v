@@ -66,8 +66,10 @@ always @ (posedge clk) begin
 end
 
 always @(posedge clk) begin
-    tag_d <= btb_tag_in;
-    tag_e <= tag_d;
+    if (BTB_we) begin
+        tag_d <= btb_tag_in;
+        tag_e <= tag_d;
+    end
 end
 
 always @(posedge clk) begin
@@ -105,7 +107,7 @@ always @(posedge clk) begin
 
     if (BTB_we && (!tag_match_e || !BTB_valid[BTBwriteaddress_i])) begin
         BTB_target[BTBwriteaddress_i] <= BTBwritedata_i;
-        BTB_tag[BTBwriteaddress_i]    <= btb_write_pc;
+        BTB_tag[BTBwriteaddress_i]    <= tag_e;
         BTB_j_flag[BTBwriteaddress_i] <= (op_e == instr_jal_op || op_e == instr_jalr_op);
         BTB_b_flag[BTBwriteaddress_i] <= (op_e == instr_branch_op);
         BTB_valid[BTBwriteaddress_i]  <= 1'b1;
