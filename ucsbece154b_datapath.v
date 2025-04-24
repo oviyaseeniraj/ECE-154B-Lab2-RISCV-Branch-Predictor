@@ -74,11 +74,6 @@ ucsbece154b_branch #(32, 5) branch_predictor (
 wire [31:0] PCPlus4F = PCF_o + 32'd4;
 wire [31:0] PCtargetF = BranchTakenF ? BTBtargetF : PCPlus4F;
 //wire [31:0] PCnewF = Mispredict_o ? PCTargetE : PCtargetF;
-wire [31:0] PCnewF = 
-    Mispredict_o ? 
-        (BranchActuallyTakenE ? PCTargetE : PCPlus4F)  // Correct misprediction
-    : 
-        PCtargetF;  // Follow prediction
 
 always @ (posedge clk) begin
     if (reset)        PCF_o <= pc_start;
@@ -193,6 +188,12 @@ wire MispredictTargetE =
     (opE == instr_jal_op || opE == instr_jalr_op) && (BTBtargetF != PCTargetE);
 assign Mispredict_o = MispredictDirectionE || MispredictTargetE;
 
+wire [31:0] PCnewF = 
+    Mispredict_o ? 
+        (BranchActuallyTakenE ? PCTargetE : PCPlus4F)  // Correct misprediction
+    : 
+        PCtargetF;  // Follow prediction
+
 // BTB/PHT updates (unchanged from your code)
 always @(*) begin
     BTBwriteaddrE  = PCE[6:2];
@@ -204,6 +205,7 @@ always @(*) begin
     PHTincE = (opE == instr_branch_op && BranchActuallyTakenE);
     GHRresetE = MispredictDirectionE;  // Reset GHR on wrong direction
 end
+
 always @ (posedge clk) begin
     if (reset | FlushE_i) begin
         RD1E     <= 32'b0;
