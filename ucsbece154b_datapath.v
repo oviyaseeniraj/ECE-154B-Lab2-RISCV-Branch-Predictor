@@ -34,7 +34,7 @@ module ucsbece154b_datapath (
 
 `include "ucsbece154b_defines.vh"
 
-localparam NUM_BTB_ENTRIES = 8;
+localparam NUM_BTB_ENTRIES = 4;
 localparam NUM_IDX_BITS = $clog2(NUM_BTB_ENTRIES);
 localparam NUM_GHR_BITS = 5;
 
