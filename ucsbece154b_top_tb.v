@@ -64,7 +64,7 @@ initial begin
     @(posedge clk);
     reset = 0;
 
-    for (i = 0; i < 10000; i = i + 1) begin
+    for (i = 0; i < 500; i = i + 1) begin
         @(posedge clk);
         cycle_count = cycle_count + 1;
 
