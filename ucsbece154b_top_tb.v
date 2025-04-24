@@ -80,7 +80,7 @@ initial begin
 
                     $display("[BRANCH] PC=%h TakenE=%b ZeroE=%b funct3=%b MISP=%b", 
                         BranchPCE, BranchTakenE, top.riscv.dp.ZeroE_o,
-                        top.riscv.dp.funct3E, mispredicted);
+                        top.riscv.dp.funct3E, top.riscv.dp.Mispredict_o);
                 end
                 7'b1101111, 7'b1100111: begin // jal / jalr
                     jump_count = jump_count + 1;
