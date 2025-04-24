@@ -149,8 +149,8 @@ always @(*) begin
             // Branch depends on PHT prediction
             BTBtarget_o = BTB_target[btb_index];
             BranchTaken_o = predict_taken;  // MSB of counter
-            $display("[BRANCHTAKEN] addr=%0d PHTval=%b BranchTaken_o=%b", 
-                 pc_xor_ghr, PHT[pc_xor_ghr][1], BranchTaken_o);
+            $display("[BRANCHTAKEN] pc=%h addr=%0d PHTval=%b BranchTaken_o=%b", 
+                 pc_i, pc_xor_ghr, PHT[pc_xor_ghr][1], BranchTaken_o);
         end
     end else begin
         // No valid entry in BTB, default to not taken
