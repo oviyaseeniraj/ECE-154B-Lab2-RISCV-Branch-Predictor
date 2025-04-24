@@ -34,9 +34,9 @@ module ucsbece154b_datapath (
 
 `include "ucsbece154b_defines.vh"
 
-localparam NUM_BTB_ENTRIES = 128;
+localparam NUM_BTB_ENTRIES = 32;
 localparam NUM_IDX_BITS = $clog2(NUM_BTB_ENTRIES);
-localparam NUM_GHR_BITS = 5;
+localparam NUM_GHR_BITS = 3;
 
 // FIXED: Moved earlier to avoid undefined reference
 reg [31:0] PCE;           // Program counter in EX stage
@@ -58,7 +58,7 @@ reg [NUM_IDX_BITS-1:0] BTBwriteaddrE;
 reg [31:0] BTBwritedataE;
 
 // NEW: Branch predictor instantiation
-ucsbece154b_branch #(128, 5) branch_predictor (
+ucsbece154b_branch #(NUM_BTB_ENTRIES, NUM_GHR_BITS) branch_predictor (
     .clk(clk),
     .reset_i(reset),
     .pc_i(PCF_o),
