@@ -73,7 +73,7 @@ initial begin
 
             case (top.riscv.dp.opE)
                 7'b1100011: begin // branch
-                    if (!top.riscv.c.FlushE_o && opE == 7'b1100011) branch_count <= branch_count + 1;
+                    if (!top.riscv.c.FlushE_o) branch_count <= branch_count + 1;
 
                     case (top.riscv.dp.funct3E)
                         3'b000: mispredicted = (BranchTakenE !== top.riscv.dp.ZeroE_o);  // beq
