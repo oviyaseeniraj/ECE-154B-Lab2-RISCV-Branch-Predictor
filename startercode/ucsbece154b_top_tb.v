@@ -27,6 +27,17 @@ integer instruction_count;
 integer branch_count, branch_miss_count;
 integer jump_count, jump_miss_count;
 
+reg op_e;
+
+always @(posedge clk) begin
+    if (reset) begin
+        op_e <= 0;
+    end else begin
+        // propagate op to execute stage
+        op_e <= top.riscv.dp.op_o;
+    end
+end
+
 integer i;
 initial begin
     $display("Begin simulation.");
@@ -46,6 +57,18 @@ initial begin
     for (i = 0; i < 500 && top.riscv.dp.PCF_o != 32'h00010064; i = i + 1) begin
         @(posedge clk);
 
+        if (op_e == instr_branch_op) begin
+            branch_count = branch_count + 1;
+            if (top.riscv.dp.PCSrcE_i) begin
+                branch_miss_count = branch_miss_count + 1;
+            end
+        end else if (op_e == instr_jal_op || op_e == instr_jalr_op) begin
+            jump_count = jump_count + 1;
+            if (top.riscv.dp.PCSrcE_i) begin
+                jump_miss_count = jump_miss_count + 1;
+            end
+        end
+
         cycle_count = cycle_count + 1;
 
         if (!reset && top.riscv.dp.InstrD !== 32'b0) begin
@@ -58,6 +81,12 @@ initial begin
             $display("Cycle count:            %0d", cycle_count);
             $display("Instruction count:      %0d", instruction_count);
             $display("CPI:                    %0f", 1.0 * cycle_count / instruction_count);
+            $display("Branch count:           %0d", branch_count);
+            $display("Branch misprediction:   %0d", branch_miss_count);
+            $display("Branch misprediction rate: %0f%%", 100.0 * branch_miss_count / branch_count);
+            $display("Jump count:             %0d", jump_count);
+            $display("Jump misprediction:     %0d", jump_miss_count);
+            $display("Jump misprediction rate: %0f%%", 100.0 * jump_miss_count / jump_count);
             $stop;
 end
 
