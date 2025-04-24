@@ -115,7 +115,6 @@ always @(posedge clk) begin
                  (op_e == instr_jal_op || op_e == instr_jalr_op), 
                  (op_e == instr_branch_op));
         
-        BTB_valid[BTBwriteaddress_i] = 1'b1; // try to block
         $display("[BTB ENTRY] index=%0d tag=%h target=%h j=%b b=%b valid=%b",
                 BTBwriteaddress_i, BTB_tag[BTBwriteaddress_i], BTB_target[BTBwriteaddress_i], 
                 BTB_j_flag[BTBwriteaddress_i], BTB_b_flag[BTBwriteaddress_i], BTB_valid[BTBwriteaddress_i]);
