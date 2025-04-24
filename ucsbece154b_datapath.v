@@ -34,6 +34,10 @@ module ucsbece154b_datapath (
 
 `include "ucsbece154b_defines.vh"
 
+integer NUM_BTB_ENTRIES = 128;
+integer NUM_IDX_BITS = $clog2(NUM_BTB_ENTRIES);
+integer NUM_GHR_BITS = 5;
+
 // FIXED: Moved earlier to avoid undefined reference
 reg [31:0] PCE;           // Program counter in EX stage
 reg [31:0] ExtImmE;       // Immediate in EX stage
@@ -44,17 +48,17 @@ reg [31:0] ResultW;
 // NEW: Internal signals for branch predictor
 wire [31:0] BTBtargetF;
 wire BranchTakenF;
-wire [9:0] PHTreadaddrF;     // output from branch predictor
-reg  [9:0] PHTwriteaddrD, PHTwriteaddrE;    // NEW: FIXED — now legal to assign bc reg not wire
+wire [NUM_GHR_BITS-1:0] PHTreadaddrF;     // output from branch predictor
+reg  [NUM_GHR_BITS-1:0] PHTwriteaddrD, PHTwriteaddrE;    // NEW: FIXED — now legal to assign bc reg not wire
 reg PHTweE, PHTincE;
 reg GHRresetE;
 reg BTBweE;
 reg BranchTakenD, BranchTakenE;
-reg [4:0] BTBwriteaddrE;
+reg [NUM_IDX_BITS-1:0] BTBwriteaddrE;
 reg [31:0] BTBwritedataE;
 
 // NEW: Branch predictor instantiation
-ucsbece154b_branch #(32, 10) branch_predictor (
+ucsbece154b_branch #(128, 5) branch_predictor (
     .clk(clk),
     .reset_i(reset),
     .pc_i(PCF_o),
@@ -177,7 +181,7 @@ ucsbece154b_alu alu (
 
 // Branch predictor control logic (NEW)
 always @(*) begin
-    BTBwriteaddrE  = PCE[6:2];
+    BTBwriteaddrE  = PCE[NUM_IDX_BITS+1:2];
     BTBwritedataE  = PCTargetE;
 
     // Update BTB on taken branches (including bne)
