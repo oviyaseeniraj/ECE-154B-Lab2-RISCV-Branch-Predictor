@@ -27,7 +27,7 @@ integer instruction_count;
 integer branch_count, branch_miss_count;
 integer jump_count, jump_miss_count;
 
-reg op_e;
+reg [6:0] op_e;
 
 always @(posedge clk) begin
     if (reset) begin
