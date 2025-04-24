@@ -75,6 +75,40 @@ wire [31:0] PCPlus4F = PCF_o + 32'd4;
 wire [31:0] PCtargetF = BranchTakenF ? BTBtargetF : PCPlus4F;
 //wire [31:0] PCnewF = Mispredict_o ? PCTargetE : PCtargetF;
 
+// Determine actual branch outcome
+wire BranchActuallyTakenE = 
+    (opE == instr_branch_op && 
+     ((funct3E == instr_beq_funct3 && ZeroE_o) ||   // BEQ taken
+      (funct3E == instr_bne_funct3 && !ZeroE_o)))   // BNE taken
+    || opE == instr_jal_op 
+    || opE == instr_jalr_op;
+
+// Misprediction cases
+wire MispredictDirectionE = 
+    (opE == instr_branch_op) && (BranchTakenE != BranchActuallyTakenE);
+wire MispredictTargetE = 
+    (opE == instr_jal_op || opE == instr_jalr_op) && (BTBtargetF != PCTargetE);
+assign Mispredict_o = MispredictDirectionE || MispredictTargetE;
+
+wire [31:0] PCnewF = 
+    Mispredict_o ? 
+        (BranchActuallyTakenE ? PCTargetE : PCPlus4F)  // Correct misprediction
+    : 
+        PCtargetF;  // Follow prediction
+
+// BTB/PHT updates (unchanged from your code)
+always @(*) begin
+    BTBwriteaddrE  = PCE[6:2];
+    BTBwritedataE  = PCTargetE;
+    BTBweE = (opE == instr_branch_op && BranchActuallyTakenE) 
+             || opE == instr_jal_op 
+             || opE == instr_jalr_op;
+    PHTweE = (opE == instr_branch_op);
+    PHTincE = (opE == instr_branch_op && BranchActuallyTakenE);
+    GHRresetE = MispredictDirectionE;  // Reset GHR on wrong direction
+end
+
+
 always @ (posedge clk) begin
     if (reset)        PCF_o <= pc_start;
     else if (!StallF_i) PCF_o <= PCnewF;
@@ -173,38 +207,6 @@ ucsbece154b_alu alu (
     .zero_o(ZeroE_o)
 );
 
-// Determine actual branch outcome
-wire BranchActuallyTakenE = 
-    (opE == instr_branch_op && 
-     ((funct3E == instr_beq_funct3 && ZeroE_o) ||   // BEQ taken
-      (funct3E == instr_bne_funct3 && !ZeroE_o)))   // BNE taken
-    || opE == instr_jal_op 
-    || opE == instr_jalr_op;
-
-// Misprediction cases
-wire MispredictDirectionE = 
-    (opE == instr_branch_op) && (BranchTakenE != BranchActuallyTakenE);
-wire MispredictTargetE = 
-    (opE == instr_jal_op || opE == instr_jalr_op) && (BTBtargetF != PCTargetE);
-assign Mispredict_o = MispredictDirectionE || MispredictTargetE;
-
-wire [31:0] PCnewF = 
-    Mispredict_o ? 
-        (BranchActuallyTakenE ? PCTargetE : PCPlus4F)  // Correct misprediction
-    : 
-        PCtargetF;  // Follow prediction
-
-// BTB/PHT updates (unchanged from your code)
-always @(*) begin
-    BTBwriteaddrE  = PCE[6:2];
-    BTBwritedataE  = PCTargetE;
-    BTBweE = (opE == instr_branch_op && BranchActuallyTakenE) 
-             || opE == instr_jal_op 
-             || opE == instr_jalr_op;
-    PHTweE = (opE == instr_branch_op);
-    PHTincE = (opE == instr_branch_op && BranchActuallyTakenE);
-    GHRresetE = MispredictDirectionE;  // Reset GHR on wrong direction
-end
 
 always @ (posedge clk) begin
     if (reset | FlushE_i) begin
