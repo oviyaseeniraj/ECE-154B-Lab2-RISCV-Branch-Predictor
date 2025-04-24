@@ -152,7 +152,7 @@ always @(*) begin
         end
     end else begin
         // No valid entry in BTB, default to not taken
-        BTBtarget_o = pc_i + 4;
+        //BTBtarget_o = pc_i + 4;
         BranchTaken_o = 1'b0;
     end
 end
