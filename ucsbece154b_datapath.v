@@ -38,6 +38,7 @@ module ucsbece154b_datapath (
 reg [31:0] PCE;           // Program counter in EX stage
 reg [31:0] ExtImmE;       // Immediate in EX stage
 wire [31:0] PCTargetE = PCE + ExtImmE;  // FIXED: Define early
+reg [31:0] PCPlus4E;      // PC+4 in EX stage
 reg [31:0] ResultW;
 
 // NEW: Internal signals for branch predictor
@@ -131,7 +132,7 @@ always @ (posedge clk) begin
 end
 
 // ***** EXECUTE STAGE ******************************
-reg [31:0] RD1E, RD2E, PCPlus4E;
+reg [31:0] RD1E, RD2E;
 reg [3:0] funct3E;
 reg [6:0] opE;
 
