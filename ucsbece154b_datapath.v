@@ -75,7 +75,7 @@ ucsbece154b_branch #(32, 5) branch_predictor (
 wire [31:0] PCPlus4F = PCF_o + 32'd4;
 wire [31:0] PCtargetF = BranchTakenF ? BTBtargetF : PCPlus4F;
 // wire [31:0] PCnewF = PCSrcE_i ? PCTargetE : PCtargetF;
-wire [31:0] PCnewF = PCSrcE_i ? PCTargetE :      // Misprediction correction
+wire [31:0] PCnewF = mispredict_o ? PCTargetE :      // Misprediction correction
                     BranchTakenF ? BTBtargetF :  // Predicted taken
                     PCPlus4F;                   // Default next PC
 
