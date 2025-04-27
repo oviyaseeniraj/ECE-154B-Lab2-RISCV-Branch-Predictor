@@ -1,7 +1,7 @@
 // DEBUG-ENHANCED ucsbece154b_branch.v
 module ucsbece154b_branch #(
-    parameter NUM_BTB_ENTRIES = 32,
-    parameter NUM_GHR_BITS    = 20
+    parameter NUM_BTB_ENTRIES = 4,
+    parameter NUM_GHR_BITS    = 2
 ) (
     input               clk, 
     input               reset_i,
@@ -131,7 +131,7 @@ always @(*) begin
 
     if (BTB_valid[btb_index] && tag_match) begin
         $display("[BJ] pc=%h b=%b j=%b", 
-            BTB_tag[btb_index], BTB_b_flag[btb_index], BTB_j_flag[btb_index]);
+            BTB_tag[btb_index], BTB_b_flag[btb_index],2 BTB_j_flag[btb_index]);
         if (BTB_j_flag[btb_index]) begin
             // Jumps are always taken
             BTBtarget_o = BTB_target[btb_index];
