@@ -42,6 +42,7 @@ reg [31:0] tag_d, tag_e;
 reg tag_match_d = 1'b0;
 reg tag_match_e = 1'b0;
 reg [6:0] op_e = 7'b0;
+reg BranchTakenD, BranchTakenE;
 
 integer i;
 always @ (posedge clk) begin
@@ -70,6 +71,8 @@ always @(posedge clk) begin
     tag_match_d <= tag_match;
     tag_match_e <= tag_match_d;
     op_e <= op_i;
+    BranchTakenD <= BranchTaken_o;
+    BranchTakenE <= BranchTakenD;
 end
 
 always @(*) begin
@@ -168,7 +171,7 @@ always @(posedge clk) begin
         GHR <= {NUM_GHR_BITS{1'b0}};
     end else if (PHTwe_i) begin
         //GHR <= {GHR[NUM_GHR_BITS-2:0], BranchTaken_o};  // Shift in latest result
-        GHR <= {BranchTaken_o, GHR[NUM_GHR_BITS-1:1]};
+        GHR <= {BranchTakenE, GHR[NUM_GHR_BITS-1:1]};
         //GHR <= {GHR[NUM_GHR_BITS-2:0], PHTincrement_i};
     end
 end
