@@ -51,7 +51,7 @@ wire BranchTakenF;
 wire [NUM_GHR_BITS-1:0] PHTreadaddrF;     // output from branch predictor
 reg  [NUM_GHR_BITS-1:0] PHTwriteaddrD, PHTwriteaddrE;    // NEW: FIXED — now legal to assign bc reg not wire
 reg PHTweE, PHTincE;
-reg GHRresetE;
+reg GHRweF, GHRresetE;
 reg BTBweE;
 reg BranchTakenD, BranchTakenE;
 reg [NUM_IDX_BITS-1:0] BTBwriteaddrE;
@@ -71,6 +71,7 @@ ucsbece154b_branch #(NUM_BTB_ENTRIES, NUM_GHR_BITS) branch_predictor (
     .PHTincrement_i(PHTincE),
     .GHRreset_i(GHRresetE),
     .PHTwe_i(PHTweE),
+    .GHRwe_i(GHRweF),
     .PHTwriteaddress_i(PHTwriteaddrE),
     .PHTreadaddress_o(PHTreadaddrF)
 );
@@ -193,6 +194,8 @@ always @(*) begin
     
     // Update PHT on all branches
     PHTweE = (opE == instr_branch_op);
+
+    GHRweF = (op_i == instr_branch_op);
     
     // Increment PHT counter if branch is taken (correct for both beq and bne)
     PHTincE = (opE == instr_branch_op && 
