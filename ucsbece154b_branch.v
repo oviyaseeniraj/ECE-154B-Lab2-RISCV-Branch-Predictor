@@ -179,8 +179,8 @@ always @(posedge clk) begin
         GHR <= {NUM_GHR_BITS{1'b0}};
     end else if (GHRwe_i) begin
         //GHR <= {GHR[NUM_GHR_BITS-2:0], BranchTaken_o};  // Shift in latest result
-        $display("[GHR UPDATE] old=%b new=%b", 
-                 GHR, {BranchTaken_o, GHR[NUM_GHR_BITS-1:1]});
+        $display("[GHR UPDATE] pc=%h old=%b new=%b", 
+                 pc_i, GHR, {BranchTaken_o, GHR[NUM_GHR_BITS-1:1]});
         GHR <= {BranchTaken_o, GHR[NUM_GHR_BITS-1:1]};
         //GHR <= {GHR[NUM_GHR_BITS-2:0], PHTincrement_i};
     end

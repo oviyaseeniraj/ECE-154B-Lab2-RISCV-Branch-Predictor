@@ -181,6 +181,12 @@ ucsbece154b_alu alu (
 );
 
 // Branch predictor control logic (NEW)
+wire is_branch = (opE == instr_branch_op);
+wire is_jump = (opE == instr_jal_op) || (opE == instr_jalr_op);
+
+wire branch_taken_actual = (funct3E == instr_beq_funct3 && ZeroE_o) ||
+                            (funct3E == instr_bne_funct3 && !ZeroE_o);
+
 always @(*) begin
     BTBwriteaddrE  = PCE[NUM_IDX_BITS+1:2];
     BTBwritedataE  = PCTargetE;
@@ -201,13 +207,11 @@ always @(*) begin
     PHTincE = (opE == instr_branch_op && 
               ((funct3E == instr_beq_funct3 && ZeroE_o) ||   // beq taken
                (funct3E == instr_bne_funct3 && !ZeroE_o)));  // bne taken
-    
+
     // Reset GHR on misprediction
-    GHRresetE = ((opE == instr_branch_op) && (BranchTakenE != 
-               ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq taken
-                (funct3E == instr_bne_funct3 && !ZeroE_o)))) || // bne taken
-                ((opE == instr_jal_op || opE == instr_jalr_op) && !BranchTakenE); 
-    
+    GHRresetE = (is_branch && (BranchTakenE != branch_taken_actual)) ||
+                   (is_jump && (BranchTakenE != 1'b1));
+
     Mispredict_o = GHRresetE || ((opE == instr_jal_op || opE == instr_jalr_op) && !BranchTakenE);
 
     /**
