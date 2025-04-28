@@ -24,7 +24,6 @@ module ucsbece154b_branch #(
 
 localparam BTB_IDX_BITS = $clog2(NUM_BTB_ENTRIES);
 
-
 reg [31:0] BTB_target [0:NUM_BTB_ENTRIES-1];
 reg [31:0] BTB_tag    [0:NUM_BTB_ENTRIES-1];
 reg        BTB_j_flag [0:NUM_BTB_ENTRIES-1];
@@ -135,8 +134,10 @@ always @(*) begin
     BranchTaken_o = 1'b0;
 
     if (BTB_valid[btb_index] && tag_match) begin
-        // $display("[BJ] pc=%h b=%b j=%b", 
+        /**
+        $display("[BJ] pc=%h b=%b j=%b", 
             BTB_tag[btb_index], BTB_b_flag[btb_index], BTB_j_flag[btb_index]);
+        */
         if (BTB_j_flag[btb_index]) begin
             // Jumps are always taken
             BTBtarget_o = BTB_target[btb_index];
