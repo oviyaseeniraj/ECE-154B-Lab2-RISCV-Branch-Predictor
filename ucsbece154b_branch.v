@@ -55,9 +55,9 @@ always @ (posedge clk) begin
             BTB_valid[i]  <= 1'b0;
         end
 
-        // Initialize PHT to weakly not taken
+        // Initialize PHT to strongly not taken
          for (i = 0; i < (1 << NUM_GHR_BITS); i = i + 1) begin
-             PHT[i] <= 2'b01;
+             PHT[i] <= 2'b00;
          end
          
          GHR <= {NUM_GHR_BITS{1'b0}};

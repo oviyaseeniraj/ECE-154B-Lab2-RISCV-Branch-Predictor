@@ -203,9 +203,11 @@ always @(*) begin
                (funct3E == instr_bne_funct3 && !ZeroE_o)));  // bne taken
     
     // Reset GHR on misprediction
-    GHRresetE = (opE == instr_branch_op) && (BranchTakenE != 
+    GHRresetE = ((opE == instr_branch_op) && (BranchTakenE != 
                ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq taken
-                (funct3E == instr_bne_funct3 && !ZeroE_o))); // bne taken
+                (funct3E == instr_bne_funct3 && !ZeroE_o)))) || // bne taken
+                ((opE == instr_jal_op || opE == instr_jalr_op) &&
+                !BranchTakenE); 
     
     Mispredict_o = GHRresetE || ((opE == instr_jal_op || opE == instr_jalr_op) && !BranchTakenE);
 
