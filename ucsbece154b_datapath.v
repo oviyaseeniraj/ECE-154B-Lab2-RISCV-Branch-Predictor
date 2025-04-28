@@ -209,7 +209,7 @@ always @(*) begin
                (funct3E == instr_bne_funct3 && !ZeroE_o)));  // bne taken
 
     // Reset GHR on misprediction
-    GHRresetE = branch_predictor.btb_hit_e && (is_branch && (BranchTakenE != branch_taken_actual)) ||
+    GHRresetE = (is_branch && (BranchTakenE != branch_taken_actual)) ||
                    (is_jump && (BranchTakenE != 1'b1));
 
     Mispredict_o = GHRresetE || ((opE == instr_jal_op || opE == instr_jalr_op) && !BranchTakenE);

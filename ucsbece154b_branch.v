@@ -124,16 +124,10 @@ assign PHTreadaddress_o = pc_xor_ghr;
 wire predict_taken = PHT[pc_xor_ghr][1];
 
 wire btb_hit = BTB_valid[btb_index] && (btb_tag_in == BTB_tag[btb_index]);
-reg btb_hit_d, btb_hit_e;
 assign btb_b = btb_hit ? BTB_b_flag[btb_index] : 1'b0;
 assign btb_j = btb_hit ? BTB_j_flag[btb_index] : 1'b0;
 
 assign btb_valid = BTB_valid[btb_index];
-
-always @(posedge clk) begin
-    btb_hit_d <= btb_hit;
-    btb_hit_e <= btb_hit_d;
-end
 
 always @(*) begin
     BTBtarget_o = 32'b0;
