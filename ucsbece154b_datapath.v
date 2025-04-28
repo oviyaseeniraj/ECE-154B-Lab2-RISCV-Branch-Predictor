@@ -36,7 +36,7 @@ module ucsbece154b_datapath (
 
 localparam NUM_BTB_ENTRIES = 32;
 localparam NUM_IDX_BITS = $clog2(NUM_BTB_ENTRIES);
-localparam NUM_GHR_BITS = 2;
+localparam NUM_GHR_BITS = 5;
 
 // FIXED: Moved earlier to avoid undefined reference
 reg [31:0] PCE;           // Program counter in EX stage
@@ -195,7 +195,7 @@ always @(*) begin
     // Update PHT on all branches
     PHTweE = (opE == instr_branch_op);
 
-    GHRweF = (InstrF_i[6:0] == instr_branch_op);
+    GHRweF = !StallF_i && (InstrF_i[6:0] == instr_branch_op);
     
     // Increment PHT counter if branch is taken (correct for both beq and bne)
     PHTincE = (opE == instr_branch_op && 
