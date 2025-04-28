@@ -210,8 +210,10 @@ always @(*) begin
     
     Mispredict_o = GHRresetE || ((opE == instr_jal_op || opE == instr_jalr_op) && !BranchTakenE);
 
+    /**
     $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
         BTBwriteaddrE, BTBwritedataE, BTBweE, PHTwriteaddrE, PHTweE, PHTincE, GHRresetE);
+    */
 end
 
 always @ (posedge clk) begin
