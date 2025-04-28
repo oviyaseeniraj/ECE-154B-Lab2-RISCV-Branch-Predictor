@@ -195,7 +195,7 @@ always @(*) begin
     // Update PHT on all branches
     PHTweE = (opE == instr_branch_op);
 
-    GHRweF = (op_i == instr_branch_op);
+    GHRweF = (op_o == instr_branch_op);
     
     // Increment PHT counter if branch is taken (correct for both beq and bne)
     PHTincE = (opE == instr_branch_op && 
