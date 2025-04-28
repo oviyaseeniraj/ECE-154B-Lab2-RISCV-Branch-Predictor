@@ -175,7 +175,7 @@ end
 
 always @(posedge clk) begin
     if (reset_i || GHRreset_i) begin
-        $display("[GHR RESET]");
+        $display("[GHR RESET] pc = %h", pc_i);
         GHR <= {NUM_GHR_BITS{1'b0}};
     end else if (GHRwe_i) begin
         //GHR <= {GHR[NUM_GHR_BITS-2:0], BranchTaken_o};  // Shift in latest result
