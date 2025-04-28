@@ -206,8 +206,7 @@ always @(*) begin
     GHRresetE = ((opE == instr_branch_op) && (BranchTakenE != 
                ((funct3E == instr_beq_funct3 && ZeroE_o) ||  // beq taken
                 (funct3E == instr_bne_funct3 && !ZeroE_o)))) || // bne taken
-                ((opE == instr_jal_op || opE == instr_jalr_op) &&
-                !BranchTakenE); 
+                ((opE == instr_jal_op || opE == instr_jalr_op) && !BranchTakenE); 
     
     Mispredict_o = GHRresetE || ((opE == instr_jal_op || opE == instr_jalr_op) && !BranchTakenE);
 

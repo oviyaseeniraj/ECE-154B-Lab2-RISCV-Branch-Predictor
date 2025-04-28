@@ -83,6 +83,7 @@ end
 
 
 always @(posedge clk) begin
+    /**
     $display("[BTB INDEX] index=%0d", btb_index);
     $display("[BTB TAG FROM PC] tag=%h", btb_tag_in);
     $display("[BTB TAG FROM TABLE] tag=%h", BTB_tag[btb_index]);
@@ -90,6 +91,7 @@ always @(posedge clk) begin
     
     $display("[BTB TAG E MATCH] match_e=%b", tag_match_e);
     $display("[BTB TAG DECODE MATCH] match=%b", tag_match);
+    */
     // $display("[BTB INDEX EXECUTE] index=%0d", BTBwriteaddress_i);
     // $display("[BTB TAG EXEC PC] tag=%h", tag_e);
     // $display("[BTB EXEC TAG FROM TABLE] tag=%h", BTB_tag[BTBwriteaddress_i]);
@@ -102,6 +104,7 @@ always @(posedge clk) begin
         BTB_b_flag[BTBwriteaddress_i] <= (op_e == instr_branch_op);
         BTB_valid[BTBwriteaddress_i]  <= 1'b1;
 
+        /**
         $display("[BTB WRITE] index=%0d PC=%h target=%h op=%b j=%b b=%b", 
                  BTBwriteaddress_i, tag_e, BTBwritedata_i, op_e, 
                  (op_e == instr_jal_op || op_e == instr_jalr_op), 
@@ -110,6 +113,7 @@ always @(posedge clk) begin
         $display("[BTB ENTRY] index=%0d tag=%h target=%h j=%b b=%b valid=%b",
                 BTBwriteaddress_i, BTB_tag[BTBwriteaddress_i], BTB_target[BTBwriteaddress_i], 
                 BTB_j_flag[BTBwriteaddress_i], BTB_b_flag[BTBwriteaddress_i], BTB_valid[BTBwriteaddress_i]);
+        */
 
     end
     
@@ -131,7 +135,7 @@ always @(*) begin
     BranchTaken_o = 1'b0;
 
     if (BTB_valid[btb_index] && tag_match) begin
-        $display("[BJ] pc=%h b=%b j=%b", 
+        // $display("[BJ] pc=%h b=%b j=%b", 
             BTB_tag[btb_index], BTB_b_flag[btb_index], BTB_j_flag[btb_index]);
         if (BTB_j_flag[btb_index]) begin
             // Jumps are always taken
@@ -141,8 +145,10 @@ always @(*) begin
             // Branch depends on PHT prediction
             BTBtarget_o = BTB_target[btb_index];
             BranchTaken_o = predict_taken;  // MSB of counter
+            /**
             $display("[BRANCHTAKEN] pc=%h addr=%0d PHTval=%b BranchTaken_o=%b", 
                  pc_i, pc_xor_ghr, PHT[pc_xor_ghr][1], BranchTaken_o);
+            */
         end
     end else begin
         // No valid entry in BTB, default to not taken
@@ -159,16 +165,21 @@ always @(posedge clk) begin
         else if (!PHTincrement_i && PHT[PHTwriteaddress_i] > 2'b00)
             PHT[PHTwriteaddress_i] <= PHT[PHTwriteaddress_i] - 1;
 
+        /**
         $display("[PHT UPDATE] addr=%0d inc=%b new_value=%b", 
                  PHTwriteaddress_i, PHTincrement_i, PHT[PHTwriteaddress_i]);
+        */
     end
 end
 
 always @(posedge clk) begin
     if (reset_i || GHRreset_i) begin
+        $display("[GHR RESET]");
         GHR <= {NUM_GHR_BITS{1'b0}};
     end else if (GHRwe_i) begin
         //GHR <= {GHR[NUM_GHR_BITS-2:0], BranchTaken_o};  // Shift in latest result
+        $display("[GHR UPDATE] old=%b new=%b", 
+                 GHR, {BranchTaken_o, GHR[NUM_GHR_BITS-1:1]});
         GHR <= {BranchTaken_o, GHR[NUM_GHR_BITS-1:1]};
         //GHR <= {GHR[NUM_GHR_BITS-2:0], PHTincrement_i};
     end
