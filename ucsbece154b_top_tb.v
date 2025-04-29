@@ -119,7 +119,7 @@ initial begin
 
     // Stop when PC stops changing (infinite loop) or max cycles reached
     for (i = 0; i < 500 && !(prev_pc == top.riscv.dp.PCF_o && 
-                            top.riscv.dp.InstrF == 32'h0000006f); i = i + 1) begin
+                            top.riscv.dp.InstrF_i == 32'h0000006f); i = i + 1) begin
         @(posedge clk);
         prev_pc <= top.riscv.dp.PCF_o;
         
@@ -182,7 +182,7 @@ initial begin
     $display("Jump misprediction rate:   %0f%%",
         (jump_count > 0) ? 100.0 * jump_miss_count / jump_count : 0.0);
     $stop;
-    
+
 end
 
 endmodule
