@@ -191,11 +191,7 @@ always @(*) begin
     // btb write address is the index of the BTB which is the lower NUM_IDX_BITS of the PC
     BTBwriteaddrE  = PCE[NUM_IDX_BITS+1:2];
 
-    // btb write data is the target address of the branch
-    // for jumps, the target is the PC+4
-    // for branches, the target is the PC + immediate
-    // for jalr, the target is the PC + immediate
-    // for jal, the target is the PC + immediate
+    // btb write data is the target address of the branch. the target is the PC + immediate
     // for beq/bne, the target is the PC + immediate
     BTBwritedataE  = PCTargetE;
 
@@ -221,6 +217,8 @@ always @(*) begin
     GHRresetE = (is_branch && (BranchTakenE != branch_taken_actual)) ||
                    (is_jump && (BranchTakenE != 1'b1));
 
+    // mispredict_o is true if the branch was mispredicted
+    // or if the instruction is a jump and the branch was not taken
     Mispredict_o = GHRresetE || ((opE == instr_jal_op || opE == instr_jalr_op) && !BranchTakenE);
 
     /**
