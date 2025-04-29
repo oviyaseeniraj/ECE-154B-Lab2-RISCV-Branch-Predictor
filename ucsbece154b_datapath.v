@@ -219,7 +219,7 @@ always @(*) begin
 
     // mispredict_o is true if the branch was mispredicted
     // or if the instruction is a jump and the branch was not taken
-    Mispredict_o = GHRresetE || ((opE == instr_jal_op || opE == instr_jalr_op) && !BranchTakenE);
+    Mispredict_o = GHRresetE;
 
     /**
     $display("BTBwriteaddrE=%b BTBwritedataE=%h BTBweE=%b PHTwriteaddrE=%b PHTweE=%b PHTincE=%b GHRresetE=%b", 
