@@ -188,7 +188,15 @@ wire branch_taken_actual = (funct3E == instr_beq_funct3 && ZeroE_o) ||
                             (funct3E == instr_bne_funct3 && !ZeroE_o);
 
 always @(*) begin
+    // btb write address is the index of the BTB which is the lower NUM_IDX_BITS of the PC
     BTBwriteaddrE  = PCE[NUM_IDX_BITS+1:2];
+
+    // btb write data is the target address of the branch
+    // for jumps, the target is the PC+4
+    // for branches, the target is the PC + immediate
+    // for jalr, the target is the PC + immediate
+    // for jal, the target is the PC + immediate
+    // for beq/bne, the target is the PC + immediate
     BTBwritedataE  = PCTargetE;
 
     // Update BTB on taken branches (including bne)
@@ -198,9 +206,10 @@ always @(*) begin
            || opE == instr_jal_op 
            || opE == instr_jalr_op;
     
-    // Update PHT on all branches
+    // Update PHT on all branches in execute
     PHTweE = (opE == instr_branch_op);
 
+    // Update GHR on all branches in fetch
     GHRweF = !StallF_i && (InstrF_i[6:0] == instr_branch_op);
     
     // Increment PHT counter if branch is taken (correct for both beq and bne)
